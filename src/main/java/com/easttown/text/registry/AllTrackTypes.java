@@ -20,7 +20,7 @@ import net.minecraft.resources.ResourceLocation;
  * <ul>
  *   <li>{@link TrackMaterial.TrackType} —— 一种"轨距"；{@code TrackBlock} 持有所属材料，
  *       轨道边（{@code TrackEdge.getTrackMaterial().trackType}）记录轨距。</li>
- *   <li>{@link AbstractBogeyBlock#isOnIncompatibleTrack} —— 转向架所在边的轨距
+ *   <li>{@code AbstractBogeyBlock.isOnIncompatibleTrack} —— 转向架所在边的轨距
  *       ≠ {@code getTrackType(style)} 时判定不兼容（脱轨）。</li>
  *   <li>{@code Navigation.search} L706 —— 寻路只走转向架允许轨距的边。</li>
  * </ul>
@@ -37,10 +37,13 @@ public final class AllTrackTypes {
      * 转向架方块**（small_bogey / large_bogey，与 AllBogeyStyles.STANDARD 相同的方块），
      * 不单独注册新方块——由 {@code StandardBogeyBlockMixin} 让
      * {@code getTrackType(style)} 按样式返回 43kg 轨距。
+     *
+     * <p>cycle group 独立于 STANDARD（不加入 create:standard），因此用扳手不能在
+     * 普通转向架与 43kg 转向架之间互相切换——不同轨距的转向架不通用。
      */
     public static final BogeyStyle TRACK_43KG_STYLE = new BogeyStyle.Builder(
             ResourceLocation.fromNamespaceAndPath(Text.MODID, "track_43kg"),
-            AllBogeyStyles.STANDARD_CYCLE_GROUP)
+            ResourceLocation.fromNamespaceAndPath(Text.MODID, "track_43kg"))
             .displayName(Component.translatable("bogey.style.text.track_43kg"))
             .size(BogeySizes.SMALL,
                     AllBlocks.SMALL_BOGEY,

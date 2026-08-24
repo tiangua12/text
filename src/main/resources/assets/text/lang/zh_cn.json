@@ -2,5 +2,6 @@
   "itemGroup.text": "Text",
   "block.text.track_32kg": "铁轨32kg/米",
   "block.text.track_43kg": "铁轨43kg/米",
-  "bogey.style.text.track_43kg": "铁轨43kg/米转向架样式"
+  "bogey.style.text.track_43kg": "铁轨43kg/米转向架样式",
+  "track.gauge_mismatch": "无法连接：轨距不兼容"
 }
