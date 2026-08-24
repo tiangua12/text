@@ -34,6 +34,7 @@ public class TextClient {
      * 43kg 转向架 BE 渲染器与 Flywheel visual（复用 create 的实现）。
      * 该事件在注册阶段之后触发，此时 {@code text:track_43kg_bogey} BE 类型已绑定。
      */
+    @SuppressWarnings("null")
     private static void registerBogeyRenderers(EntityRenderersEvent.RegisterRenderers event) {
         var bogeyType = AllTracks.TRACK_43KG_BOGEY_BE.get();
         event.registerBlockEntityRenderer(bogeyType, BogeyBlockEntityRenderer::new);

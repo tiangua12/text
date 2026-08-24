@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
 @Mixin(TrackBlock.class)
 public class TrackBlockCurveMixin {
 
+	@SuppressWarnings("null")
 	@Inject(method = "onRemove", at = @At("HEAD"))
 	private static void text$clearCurveCollision(BlockState state, Level level, BlockPos pos, BlockState newState,
 		boolean moved, CallbackInfo ci) {

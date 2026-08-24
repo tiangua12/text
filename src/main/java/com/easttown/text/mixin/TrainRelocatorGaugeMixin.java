@@ -36,6 +36,7 @@ import net.minecraft.world.phys.Vec3;
 @Mixin(TrainRelocator.class)
 public abstract class TrainRelocatorGaugeMixin {
 
+    @SuppressWarnings("null")
     @Inject(method = "relocate", at = @At("HEAD"), cancellable = true)
     private static void text$rejectWrongGaugeRelocation(Train train, Level level, BlockPos pos,
                                                         BezierTrackPointLocation bezier, boolean bezierDirection,

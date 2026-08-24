@@ -64,6 +64,7 @@ public final class TrackCurveCollisionHelper {
 	}
 
 	/** 该方块状态是否为本功能生成的隐形碰撞填充块。 */
+	@SuppressWarnings("null")
 	public static boolean isFillBlock(BlockState state) {
 		return state.getBlock() instanceof TrackBlock
 			&& state.getValue(TrackBlock.SHAPE) == TrackShape.NONE
@@ -71,6 +72,7 @@ public final class TrackCurveCollisionHelper {
 	}
 
 	/** 弯道创建后调用：把曲线扫过的空气格子填充为 NONE 轨道方块（仅服务端、平面、32kg、配置开启时）。 */
+	@SuppressWarnings("null")
 	public static void fillCurveCollision(Level level, BezierConnection bc, TrackMaterial material) {
 		if (level.isClientSide)
 			return;
@@ -95,6 +97,7 @@ public final class TrackCurveCollisionHelper {
 		int minZ = (int) Math.floor(bounds.minZ - 1);
 		int maxZ = (int) Math.ceil(bounds.maxZ + 1);
 
+		@SuppressWarnings("null")
 		BlockState noneState = material.getBlock()
 			.defaultBlockState()
 			.setValue(TrackBlock.SHAPE, TrackShape.NONE)
@@ -122,6 +125,7 @@ public final class TrackCurveCollisionHelper {
 	}
 
 	/** 弯道拆除时调用：清除该连接包围盒内所有 NONE 轨道方块（仅服务端）。 */
+	@SuppressWarnings("null")
 	public static void clearCurveCollision(Level level, BezierConnection bc) {
 		if (level.isClientSide)
 			return;

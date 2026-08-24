@@ -37,6 +37,7 @@ public class Track43kgBlock extends TrackBlock {
      * 导致在 43kg 轨道上右击轨道装配时生成标准转向架——跨轨距。
      * 覆写为 43kg 专用转向架（小号），轴方向跟随轨道形状。
      */
+    @SuppressWarnings("null")
     @Override
     public BlockState getBogeyAnchor(BlockGetter world, BlockPos pos, BlockState state) {
         return AllTracks.TRACK_43KG_BOGEY_BLOCK.get().defaultBlockState()

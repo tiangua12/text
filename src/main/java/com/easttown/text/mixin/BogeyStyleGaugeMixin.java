@@ -13,6 +13,7 @@ import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
@@ -29,6 +30,7 @@ import net.minecraft.world.phys.BlockHitResult;
 @Mixin(AbstractBogeyBlock.class)
 public abstract class BogeyStyleGaugeMixin {
 
+    @SuppressWarnings("null")
     @Inject(method = "useItemOn", at = @At("HEAD"), cancellable = true)
     private void text$rejectCrossGaugeStyleSwitch(ItemStack stack, BlockState state, Level level,
                                                   net.minecraft.core.BlockPos pos, Player player, InteractionHand hand,
@@ -38,7 +40,7 @@ public abstract class BogeyStyleGaugeMixin {
         if (player.isShiftKeyDown() || !stack.is(com.simibubi.create.AllItems.WRENCH.get()))
             return;
 
-        net.minecraft.world.level.block.entity.BlockEntity be = level.getBlockEntity(pos);
+        BlockEntity be = level.getBlockEntity(pos);
         if (!(be instanceof com.simibubi.create.content.trains.bogey.AbstractBogeyBlockEntity sbbe))
             return;
 

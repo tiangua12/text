@@ -25,6 +25,7 @@ public final class AllTracks {
 
         public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(Text.MODID);
         public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(Text.MODID);
+        @SuppressWarnings("null")
         public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES =
                         DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, Text.MODID);
         @SuppressWarnings("null")
@@ -71,6 +72,7 @@ public final class AllTracks {
                                                         .noOcclusion(),
                                         BogeySizes.SMALL));
 
+        @SuppressWarnings("null")
         public static final DeferredHolder<Item, Item> TRACK_43KG_BOGEY_ITEM = ITEMS.register(
                         "track_43kg_bogey", () -> new net.minecraft.world.item.BlockItem(
                                         TRACK_43KG_BOGEY_BLOCK.get(), new Item.Properties()));
@@ -86,6 +88,7 @@ public final class AllTracks {
                                                         .noOcclusion(),
                                         BogeySizes.LARGE));
 
+        @SuppressWarnings("null")
         public static final DeferredHolder<Item, Item> TRACK_43KG_LARGE_BOGEY_ITEM = ITEMS.register(
                         "track_43kg_large_bogey", () -> new net.minecraft.world.item.BlockItem(
                                         TRACK_43KG_LARGE_BOGEY_BLOCK.get(), new Item.Properties()));

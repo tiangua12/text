@@ -42,8 +42,9 @@ public class TextTrackSavedData extends SavedData {
         return new SavedData.Factory<>(TextTrackSavedData::new, TextTrackSavedData::load);
     }
 
+    @SuppressWarnings("null")
     @Override
-    public CompoundTag save(CompoundTag nbt, HolderLookup.Provider registries) {
+    public CompoundTag save(@SuppressWarnings("null") CompoundTag nbt, @SuppressWarnings("null") HolderLookup.Provider registries) {
         // 43kg 图始终从全局网络提取（运行时图与标准轨道图物理隔离，见 Track43kgBlock）
         DimensionPalette dimensions = new DimensionPalette();
         nbt.put(KEY_GRAPHS, NBTHelper.writeCompoundList(
@@ -52,6 +53,7 @@ public class TextTrackSavedData extends SavedData {
         return nbt;
     }
 
+    @SuppressWarnings("null")
     private static TextTrackSavedData load(CompoundTag nbt, HolderLookup.Provider registries) {
         TextTrackSavedData sd = new TextTrackSavedData();
         DimensionPalette dimensions = DimensionPalette.read(nbt);
@@ -66,6 +68,7 @@ public class TextTrackSavedData extends SavedData {
         return trackNetworks;
     }
 
+    @SuppressWarnings("null")
     public static TextTrackSavedData load(MinecraftServer server) {
         return server.overworld()
                 .getDataStorage()

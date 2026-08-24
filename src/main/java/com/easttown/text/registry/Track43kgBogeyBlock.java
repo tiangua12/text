@@ -1,5 +1,7 @@
 package com.easttown.text.registry;
 
+import javax.annotation.Nonnull;
+
 import com.simibubi.create.content.trains.bogey.BogeySizes;
 import com.simibubi.create.content.trains.bogey.BogeyStyle;
 import com.simibubi.create.content.trains.bogey.StandardBogeyBlock;
@@ -49,8 +51,9 @@ public class Track43kgBogeyBlock extends StandardBogeyBlock {
      * 手动放置转向架时 AXIS 恒为默认值 X（轴不跟随玩家朝向）。
      * 覆写后：轴方向 = 玩家放置时的水平朝向，且保持含水状态一致。
      */
+    @SuppressWarnings("null")
     @Override
-    public BlockState getStateForPlacement(BlockPlaceContext context) {
+    public BlockState getStateForPlacement(@Nonnull BlockPlaceContext context) {
         BlockState state = defaultBlockState().setValue(AXIS, context.getHorizontalDirection().getAxis());
         return ProperWaterloggedBlock.withWater(context.getLevel(), state, context.getClickedPos());
     }

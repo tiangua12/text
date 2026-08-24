@@ -35,6 +35,7 @@ public class Config {
     static final ModConfigSpec SPEC = BUILDER.build();
 
     /** 由 Text 构造器注册到 mod bus；Loading（含默认关闭的首次加载）与 Reloading 都会触发。 */
+    @SuppressWarnings("null")
     public static void onConfigEvent(ModConfigEvent event) {
         if (event.getConfig().getSpec() != Config.SPEC)
             return;
