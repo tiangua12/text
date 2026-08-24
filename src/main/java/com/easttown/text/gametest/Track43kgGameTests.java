@@ -16,6 +16,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.gametest.GameTestHolder;
 
 /**
  * 43kg 轨距功能 GameTest：
@@ -26,10 +27,11 @@ import net.minecraft.world.level.block.state.BlockState;
  *   <li>放置 43kg 轨道后能进入轨道图（TrackGraph），且与标准轨道互不相连。</li>
  * </ol>
  */
+@GameTestHolder("text")
 public class Track43kgGameTests {
 
-    @GameTest(template = "empty")
-    public static void test43kgRegistries(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "text")
+    public void test43kgRegistries(GameTestHelper helper) {
         // 1. 方块注册
         Block block = BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath("text", "track_43kg"));
         if (block != AllTracks.TRACK_43KG_BLOCK.get())
@@ -53,8 +55,8 @@ public class Track43kgGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "empty", timeoutTicks = 200)
-    public static void test43kgTrackGraphIsolation(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "text", timeoutTicks = 200)
+    public void test43kgTrackGraphIsolation(GameTestHelper helper) {
         GlobalRailwayManager railways = Create.RAILWAYS;
 
         // 放置两条标准轨道（互连）
