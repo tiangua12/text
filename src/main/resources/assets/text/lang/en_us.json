@@ -1,0 +1,16 @@
+{
+  "itemGroup.text": "Text",
+  "block.text.track_32kg": "32kg/m Rail",
+  "block.text.track_43kg": "43kg/m Rail",
+  "block.text.track_43kg_bogey": "43kg/m Bogey",
+  "block.text.track_43kg_large_bogey": "43kg/m Large Bogey",
+  "bogey.style.text.track_43kg": "43kg/m Bogey Style",
+
+  "text.configuration.title": "Text Configs",
+  "text.configuration.section.text.common.toml": "Text Configs",
+  "text.configuration.section.text.common.toml.title": "Text Configs",
+  "text.configuration.items": "Item List",
+  "text.configuration.logDirtBlock": "Log Dirt Block",
+  "text.configuration.magicNumberIntroduction": "Magic Number Text",
+  "text.configuration.magicNumber": "Magic Number"
+}

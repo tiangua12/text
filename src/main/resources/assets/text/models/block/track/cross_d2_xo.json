@@ -1,0 +1,10 @@
+{
+	"loader": "neoforge:obj",
+	"model": "text:models/block/track/cross_d2_xo.obj",
+	"flip_v": true,
+	"shade_quads": true,
+	"render_type": "minecraft:cutout_mipped",
+	"textures": {
+		"particle": "text:block/track/track_32kg/ascending"
+	}
+}
