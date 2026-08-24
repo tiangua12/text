@@ -16,13 +16,21 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 public class Track43kgBogeyBlockEntity extends StandardBogeyBlockEntity {
 
+    /** 供 2 参数工厂使用的类型缓存（注册时由 AllTracks 设置）。 */
+    private static BlockEntityType<?> cachedType;
+
     public Track43kgBogeyBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
 
-    /** BlockEntityType.Builder.of 使用的 2 参数构造器（type 由 Builder 在创建时设置）。 */
+    /** 2 参数构造器（BlockEntityType.Builder.of 使用）：从缓存获取真实类型。 */
     public Track43kgBogeyBlockEntity(BlockPos pos, BlockState state) {
-        this(null, pos, state);
+        this(cachedType, pos, state);
+    }
+
+    /** 注册时调用：把真实 BE 类型写入缓存，供 2 参数工厂使用。 */
+    public static void init(BlockEntityType<?> type) {
+        cachedType = type;
     }
 
     @Override

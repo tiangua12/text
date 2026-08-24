@@ -5,8 +5,11 @@ import com.simibubi.create.content.trains.bogey.BogeyStyle;
 import com.simibubi.create.content.trains.bogey.StandardBogeyBlock;
 import com.simibubi.create.content.trains.bogey.StandardBogeyBlockEntity;
 import com.simibubi.create.content.trains.track.TrackMaterial;
+import com.simibubi.create.foundation.block.ProperWaterloggedBlock;
 
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * 43kg 轨距专用转向架方块（小号/大号共用此类，由 size 区分）。
@@ -39,5 +42,16 @@ public class Track43kgBogeyBlock extends StandardBogeyBlock {
     @Override
     public BlockEntityType<? extends StandardBogeyBlockEntity> getBlockEntityType() {
         return AllTracks.TRACK_43KG_BOGEY_BE.get();
+    }
+
+    /**
+     * Create 的 {@code AbstractBogeyBlock} 没有覆写 {@code getStateForPlacement}，
+     * 手动放置转向架时 AXIS 恒为默认值 X（轴不跟随玩家朝向）。
+     * 覆写后：轴方向 = 玩家放置时的水平朝向，且保持含水状态一致。
+     */
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        BlockState state = defaultBlockState().setValue(AXIS, context.getHorizontalDirection().getAxis());
+        return ProperWaterloggedBlock.withWater(context.getLevel(), state, context.getClickedPos());
     }
 }

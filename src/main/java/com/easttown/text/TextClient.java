@@ -19,7 +19,6 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
-import net.neoforged.neoforge.common.NeoForge;
 
 @Mod(value = Text.MODID, dist = Dist.CLIENT)
 public class TextClient {
@@ -29,8 +28,17 @@ public class TextClient {
         IEventBus modBus = container.getEventBus();
         if (modBus != null)
             modBus.addListener(TextClient::registerBogeyRenderers);
-        // Flywheel visual：43kg 转向架 BE 复用 create 的 BogeyBlockEntityVisual
-        VisualizerRegistry.setVisualizer(AllTracks.TRACK_43KG_BOGEY_BE.get(),
+    }
+
+    /**
+     * 43kg 转向架 BE 渲染器与 Flywheel visual（复用 create 的实现）。
+     * 该事件在注册阶段之后触发，此时 {@code text:track_43kg_bogey} BE 类型已绑定。
+     */
+    private static void registerBogeyRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        var bogeyType = AllTracks.TRACK_43KG_BOGEY_BE.get();
+        event.registerBlockEntityRenderer(bogeyType, BogeyBlockEntityRenderer::new);
+
+        VisualizerRegistry.setVisualizer(bogeyType,
                 new BlockEntityVisualizer<>() {
                     @Override
                     public BlockEntityVisual<? super Track43kgBogeyBlockEntity> createVisual(
@@ -43,12 +51,6 @@ public class TextClient {
                         return false;
                     }
                 });
-    }
-
-    /** 43kg 转向架 BE 渲染器（复用 create 的 BogeyBlockEntityRenderer）。 */
-    private static void registerBogeyRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerBlockEntityRenderer(AllTracks.TRACK_43KG_BOGEY_BE.get(),
-                BogeyBlockEntityRenderer::new);
     }
 
     /**
