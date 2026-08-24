@@ -1,6 +1,7 @@
 package com.easttown.text.registry;
 
 import com.easttown.text.Text;
+import com.simibubi.create.content.trains.bogey.BogeySizes;
 import com.simibubi.create.content.trains.track.TrackBlock;
 import com.simibubi.create.content.trains.track.TrackBlockItem;
 
@@ -11,6 +12,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -74,6 +76,50 @@ public final class AllTracks {
         public static final DeferredHolder<Item, TrackBlockItem> TRACK_43KG_ITEM = ITEMS.register(
                         "track_43kg", () -> new TrackBlockItem(TRACK_43KG_BLOCK.get(), new Item.Properties()));
 
+        /** 43kg 转向架专用 BE 类型注册表。 */
+        public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES =
+                        DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, Text.MODID);
+
+        /** 43kg 轨距专用转向架（小号）：真正独立的转向架方块，只在 43kg 轨道上兼容。 */
+        @SuppressWarnings("null")
+        public static final DeferredHolder<Block, Track43kgBogeyBlock> TRACK_43KG_BOGEY_BLOCK = BLOCKS.register(
+                        "track_43kg_bogey", () -> new Track43kgBogeyBlock(
+                                        BlockBehaviour.Properties.of()
+                                                        .mapColor(MapColor.METAL)
+                                                        .strength(0.8f)
+                                                        .sound(SoundType.NETHERITE_BLOCK)
+                                                        .noOcclusion(),
+                                        BogeySizes.SMALL));
+
+        public static final DeferredHolder<Item, Item> TRACK_43KG_BOGEY_ITEM = ITEMS.register(
+                        "track_43kg_bogey", () -> new net.minecraft.world.item.BlockItem(
+                                        TRACK_43KG_BOGEY_BLOCK.get(), new Item.Properties()));
+
+        /** 43kg 轨距专用转向架（大号）。 */
+        @SuppressWarnings("null")
+        public static final DeferredHolder<Block, Track43kgBogeyBlock> TRACK_43KG_LARGE_BOGEY_BLOCK = BLOCKS.register(
+                        "track_43kg_large_bogey", () -> new Track43kgBogeyBlock(
+                                        BlockBehaviour.Properties.of()
+                                                        .mapColor(MapColor.METAL)
+                                                        .strength(0.8f)
+                                                        .sound(SoundType.NETHERITE_BLOCK)
+                                                        .noOcclusion(),
+                                        BogeySizes.LARGE));
+
+        public static final DeferredHolder<Item, Item> TRACK_43KG_LARGE_BOGEY_ITEM = ITEMS.register(
+                        "track_43kg_large_bogey", () -> new net.minecraft.world.item.BlockItem(
+                                        TRACK_43KG_LARGE_BOGEY_BLOCK.get(), new Item.Properties()));
+
+        /** 43kg 转向架专用 BE 类型：validBlocks 只含 43kg 转向架方块。 */
+        @SuppressWarnings("null")
+        public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<Track43kgBogeyBlockEntity>> TRACK_43KG_BOGEY_BE =
+                        BLOCK_ENTITY_TYPES.register("track_43kg_bogey",
+                                        () -> BlockEntityType.Builder
+                                                        .of(Track43kgBogeyBlockEntity::new,
+                                                                        TRACK_43KG_BOGEY_BLOCK.get(),
+                                                                        TRACK_43KG_LARGE_BOGEY_BLOCK.get())
+                                                        .build(null));
+
         @SuppressWarnings("null")
         public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TEXT_TAB = TABS.register(
                         "text", () -> CreativeModeTab.builder()
@@ -82,6 +128,8 @@ public final class AllTracks {
                                         .displayItems((params, output) -> {
                                                 output.accept(TRACK_32KG_ITEM.get());
                                                 output.accept(TRACK_43KG_ITEM.get());
+                                                output.accept(TRACK_43KG_BOGEY_ITEM.get());
+                                                output.accept(TRACK_43KG_LARGE_BOGEY_ITEM.get());
                                         })
                                         .build());
 

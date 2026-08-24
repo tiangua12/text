@@ -2,7 +2,7 @@
   "required": true,
   "package": "com.easttown.text.mixin",
   "compatibilityLevel": "JAVA_21",
-  "mixins": ["TrackTargetingBlockItemMixin", "CTrainsMixin", "BezierSegmentAnglesMixin", "BezierGirderAnglesMixin", "TrackPlacementCurveMixin", "TrackBlockCurveMixin", "RailwaySavedDataMixin", "GlobalRailwayManagerMixin", "StandardBogeyBlockMixin", "TrackPlacementMixin", "PlacementInfoAccessor", "TrackEdgeGaugeMixin", "CarriageBogeyGaugeMixin", "TrainDerailMixin"],
+  "mixins": ["TrackTargetingBlockItemMixin", "CTrainsMixin", "BezierSegmentAnglesMixin", "BezierGirderAnglesMixin", "TrackPlacementCurveMixin", "TrackBlockCurveMixin", "RailwaySavedDataMixin", "GlobalRailwayManagerMixin", "TrackEdgeGaugeMixin", "TrainDerailMixin"],
   "injectors": {
     "defaultRequire": 1
   },

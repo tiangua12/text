@@ -21,6 +21,7 @@ public class Text {
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
         AllTracks.BLOCKS.register(modEventBus);
         AllTracks.ITEMS.register(modEventBus);
+        AllTracks.BLOCK_ENTITY_TYPES.register(modEventBus);
         AllTracks.TABS.register(modEventBus);
         modEventBus.addListener(Config::onConfigEvent);
     }

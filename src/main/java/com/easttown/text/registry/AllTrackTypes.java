@@ -1,8 +1,6 @@
 package com.easttown.text.registry;
 
 import com.easttown.text.Text;
-import com.simibubi.create.AllBlocks;
-import com.simibubi.create.AllBogeyStyles;
 import com.simibubi.create.content.trains.bogey.BogeySizes;
 import com.simibubi.create.content.trains.bogey.BogeyStyle;
 import com.simibubi.create.content.trains.bogey.StandardBogeyRenderer;
@@ -32,11 +30,10 @@ public final class AllTrackTypes {
             ResourceLocation.fromNamespaceAndPath(Text.MODID, "track_43kg"), TrackBlock::new);
 
     /**
-     * 43kg 专用转向架样式。测试阶段：外观与 Create 普通转向架一致
-     * （复用 StandardBogeyRenderer / StandardBogeyVisual），且**复用 Create 已有的
-     * 转向架方块**（small_bogey / large_bogey，与 AllBogeyStyles.STANDARD 相同的方块），
-     * 不单独注册新方块——由 {@code StandardBogeyBlockMixin} 让
-     * {@code getTrackType(style)} 按样式返回 43kg 轨距。
+     * 43kg 专用转向架样式：外观复用 Create 普通转向架的渲染
+     * （StandardBogeyRenderer / StandardBogeyVisual），但指向<b>真正独立的
+     * 43kg 转向架方块</b>（track_43kg_bogey / track_43kg_large_bogey）——
+     * 玩家必须使用 43kg 转向架方块装配列车，而非普通转向架。
      *
      * <p>cycle group 独立于 STANDARD（不加入 create:standard），因此用扳手不能在
      * 普通转向架与 43kg 转向架之间互相切换——不同轨距的转向架不通用。
@@ -46,11 +43,11 @@ public final class AllTrackTypes {
             ResourceLocation.fromNamespaceAndPath(Text.MODID, "track_43kg"))
             .displayName(Component.translatable("bogey.style.text.track_43kg"))
             .size(BogeySizes.SMALL,
-                    AllBlocks.SMALL_BOGEY,
+                    () -> AllTracks.TRACK_43KG_BOGEY_BLOCK.get(),
                     () -> () -> new BogeyStyle.SizeRenderer(
                             new StandardBogeyRenderer.Small(), StandardBogeyVisual.Small::new))
             .size(BogeySizes.LARGE,
-                    AllBlocks.LARGE_BOGEY,
+                    () -> AllTracks.TRACK_43KG_LARGE_BOGEY_BLOCK.get(),
                     () -> () -> new BogeyStyle.SizeRenderer(
                             new StandardBogeyRenderer.Large(), StandardBogeyVisual.Large::new))
             .build();
