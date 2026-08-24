@@ -1,6 +1,7 @@
 package com.easttown.text.registry;
 
 import com.easttown.text.Text;
+import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllBogeyStyles;
 import com.simibubi.create.content.trains.bogey.BogeySizes;
 import com.simibubi.create.content.trains.bogey.BogeyStyle;
@@ -32,19 +33,21 @@ public final class AllTrackTypes {
 
     /**
      * 43kg 专用转向架样式。测试阶段：外观与 Create 普通转向架一致
-     * （复用 StandardBogeyRenderer / StandardBogeyVisual），但 {@code getTrackType}
-     * 返回 43kg 轨距 → 只能在 43kg 轨道上正常行驶。
+     * （复用 StandardBogeyRenderer / StandardBogeyVisual），且**复用 Create 已有的
+     * 转向架方块**（small_bogey / large_bogey，与 AllBogeyStyles.STANDARD 相同的方块），
+     * 不单独注册新方块——由 {@code StandardBogeyBlockMixin} 让
+     * {@code getTrackType(style)} 按样式返回 43kg 轨距。
      */
     public static final BogeyStyle TRACK_43KG_STYLE = new BogeyStyle.Builder(
             ResourceLocation.fromNamespaceAndPath(Text.MODID, "track_43kg"),
             AllBogeyStyles.STANDARD_CYCLE_GROUP)
             .displayName(Component.translatable("bogey.style.text.track_43kg"))
             .size(BogeySizes.SMALL,
-                    () -> AllTracks.TRACK_43KG_BOGEY_BLOCK.get(),
+                    AllBlocks.SMALL_BOGEY,
                     () -> () -> new BogeyStyle.SizeRenderer(
                             new StandardBogeyRenderer.Small(), StandardBogeyVisual.Small::new))
             .size(BogeySizes.LARGE,
-                    () -> AllTracks.TRACK_43KG_LARGE_BOGEY_BLOCK.get(),
+                    AllBlocks.LARGE_BOGEY,
                     () -> () -> new BogeyStyle.SizeRenderer(
                             new StandardBogeyRenderer.Large(), StandardBogeyVisual.Large::new))
             .build();
