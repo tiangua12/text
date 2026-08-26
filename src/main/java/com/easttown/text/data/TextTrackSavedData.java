@@ -44,7 +44,7 @@ public class TextTrackSavedData extends SavedData {
 
     @SuppressWarnings("null")
     @Override
-    public CompoundTag save(@SuppressWarnings("null") CompoundTag nbt, @SuppressWarnings("null") HolderLookup.Provider registries) {
+    public CompoundTag save( CompoundTag nbt,  HolderLookup.Provider registries) {
         // 43kg 图始终从全局网络提取（运行时图与标准轨道图物理隔离，见 Track43kgBlock）
         DimensionPalette dimensions = new DimensionPalette();
         nbt.put(KEY_GRAPHS, NBTHelper.writeCompoundList(

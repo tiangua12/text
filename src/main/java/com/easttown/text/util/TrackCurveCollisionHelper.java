@@ -97,7 +97,6 @@ public final class TrackCurveCollisionHelper {
 		int minZ = (int) Math.floor(bounds.minZ - 1);
 		int maxZ = (int) Math.ceil(bounds.maxZ + 1);
 
-		@SuppressWarnings("null")
 		BlockState noneState = material.getBlock()
 			.defaultBlockState()
 			.setValue(TrackBlock.SHAPE, TrackShape.NONE)
