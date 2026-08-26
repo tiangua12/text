@@ -4,7 +4,9 @@
   "block.text.track_43kg": "43kg/m Rail",
   "block.text.track_43kg_bogey": "43kg/m Bogey",
   "block.text.track_43kg_large_bogey": "43kg/m Large Bogey",
-  "bogey.style.text.track_43kg": "43kg/m Bogey Style",
+  "bogey.style.text.track_43kg": "43kg/m Small Bogey Style",
+  "bogey.style.text.track_43kg_large": "43kg/m Large Bogey Style",
+  "bogey.style.text.hxd3c": "HXD3C Electric Bogey Style",
 
   "text.configuration.title": "Text Configs",
   "text.configuration.section.text.common.toml": "Text Configs",

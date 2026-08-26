@@ -1,0 +1,11 @@
+{
+  "loader": "neoforge:obj",
+  "model": "text:models/block/hxd3c/bogey/hxd3c_bogey_frame.obj",
+  "flip_v": true,
+  "shade_quads": true,
+  "textures": {
+    "particle": "text:block/hxd3c/bogey/hxd3c_z_a",
+    "m_69a32d56-6759-8506-3c70-d95bd9360e00": "text:block/hxd3c/bogey/hxd3c_z_a"
+  },
+  "render_type": "minecraft:cutout_mipped"
+}

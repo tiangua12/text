@@ -49,7 +49,9 @@ public class TextClient {
 
                     @Override
                     public boolean skipVanillaRender(Track43kgBogeyBlockEntity blockEntity) {
-                        return false;
+                        // 必须返回 true：否则经典 BE 渲染器（BogeyBlockEntityRenderer）会与
+                        // Flywheel 视觉同时渲染，转向架被画两次（HXD3C 三轴变"六轴"）。
+                        return true;
                     }
                 });
     }

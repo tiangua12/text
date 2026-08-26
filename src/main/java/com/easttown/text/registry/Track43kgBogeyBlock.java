@@ -38,7 +38,9 @@ public class Track43kgBogeyBlock extends StandardBogeyBlock {
 
     @Override
     public BogeyStyle getDefaultStyle() {
-        return AllTrackTypes.TRACK_43KG_STYLE;
+        // 大号方块默认原版大型样式，小号方块默认原版小型样式
+        return size == BogeySizes.LARGE ? AllTrackTypes.TRACK_43KG_LARGE_STYLE
+                : AllTrackTypes.TRACK_43KG_STYLE;
     }
 
     @Override
