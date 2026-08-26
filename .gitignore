@@ -47,3 +47,4 @@ PLAN.md
 .verify_aaa-
 .verify_cc-s
 .verify_*
+.tmp*
