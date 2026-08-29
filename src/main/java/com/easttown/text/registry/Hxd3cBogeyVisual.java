@@ -24,7 +24,7 @@ import net.minecraft.nbt.CompoundTag;
 public class Hxd3cBogeyVisual implements BogeyVisual {
 
     private final TransformedInstance frame;
-    private final TransformedInstance top;
+  //  private final TransformedInstance top;
     private final TransformedInstance[] wheels =
             new TransformedInstance[Hxd3cBogeyRenderer.WHEEL_ZS.length];
 
@@ -32,9 +32,9 @@ public class Hxd3cBogeyVisual implements BogeyVisual {
         frame = ctx.instancerProvider()
                 .instancer(InstanceTypes.TRANSFORMED, SpecialModels.smoothLit(Hxd3cBogeyRenderer.FRAME))
                 .createInstance();
-        top = ctx.instancerProvider()
-                .instancer(InstanceTypes.TRANSFORMED, SpecialModels.smoothLit(Hxd3cBogeyRenderer.TOP))
-                .createInstance();
+     //   top = ctx.instancerProvider()
+      //          .instancer(InstanceTypes.TRANSFORMED, SpecialModels.smoothLit(Hxd3cBogeyRenderer.TOP))
+      //          .createInstance();
 
         var wheelInstancer = ctx.instancerProvider()
                 .instancer(InstanceTypes.TRANSFORMED, SpecialModels.smoothLit(Hxd3cBogeyRenderer.WHEEL));
@@ -56,7 +56,7 @@ public class Hxd3cBogeyVisual implements BogeyVisual {
     @Override
     public void hide() {
         frame.setZeroTransform().setChanged();
-        top.setZeroTransform().setChanged();
+    //    top.setZeroTransform().setChanged();
         for (TransformedInstance wheel : wheels)
             wheel.setZeroTransform().setChanged();
     }
@@ -64,7 +64,7 @@ public class Hxd3cBogeyVisual implements BogeyVisual {
     @Override
     public void updateLight(int packedLight) {
         frame.light(packedLight).setChanged();
-        top.light(packedLight).setChanged();
+    //    top.light(packedLight).setChanged();
         for (TransformedInstance wheel : wheels)
             wheel.light(packedLight).setChanged();
     }
@@ -72,7 +72,7 @@ public class Hxd3cBogeyVisual implements BogeyVisual {
     @Override
     public void collectCrumblingInstances(Consumer<@Nullable Instance> consumer) {
         consumer.accept(frame);
-        consumer.accept(top);
+    //    consumer.accept(top);
         for (TransformedInstance wheel : wheels)
             consumer.accept(wheel);
     }
@@ -80,7 +80,7 @@ public class Hxd3cBogeyVisual implements BogeyVisual {
     @Override
     public void delete() {
         frame.delete();
-        top.delete();
+    //    top.delete();
         for (TransformedInstance wheel : wheels)
             wheel.delete();
     }

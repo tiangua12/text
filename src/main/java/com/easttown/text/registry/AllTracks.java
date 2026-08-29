@@ -7,6 +7,7 @@ import com.simibubi.create.content.trains.track.TrackBlockItem;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -69,12 +70,15 @@ public final class AllTracks {
                                                         .mapColor(MapColor.METAL)
                                                         .strength(0.8f)
                                                         .sound(SoundType.NETHERITE_BLOCK)
-                                                        .noOcclusion(),
+                                                        .noOcclusion()
+                                                        // 无碰撞箱：玩家/实体可穿过；getShape 仍是完整方块，
+                                                        // 射线检测可命中 → 能正常点击破坏、扳手交互
+                                                        .noCollission(),
                                         BogeySizes.SMALL));
 
         @SuppressWarnings("null")
         public static final DeferredHolder<Item, Item> TRACK_43KG_BOGEY_ITEM = ITEMS.register(
-                        "track_43kg_bogey", () -> new net.minecraft.world.item.BlockItem(
+                        "track_43kg_bogey", () -> new BlockItem(
                                         TRACK_43KG_BOGEY_BLOCK.get(), new Item.Properties()));
 
         /** 43kg 轨距专用转向架（大号）。 */
@@ -85,7 +89,8 @@ public final class AllTracks {
                                                         .mapColor(MapColor.METAL)
                                                         .strength(0.8f)
                                                         .sound(SoundType.NETHERITE_BLOCK)
-                                                        .noOcclusion(),
+                                                        .noOcclusion()
+                                                        .noCollission(),
                                         BogeySizes.LARGE));
 
         @SuppressWarnings("null")
