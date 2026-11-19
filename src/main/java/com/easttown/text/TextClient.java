@@ -1,5 +1,6 @@
 package com.easttown.text;
 
+import com.easttown.text.client.NodeTrackRenderer;
 import com.easttown.text.client.TrainBoxRenderer;
 import com.easttown.text.content.bogey.Track43kgBogeyBlockEntity;
 import com.easttown.text.registry.AllBlockEntities;
@@ -42,6 +43,9 @@ public class TextClient {
     private static void registerBogeyRenderers(EntityRenderersEvent.RegisterRenderers event) {
         var bogeyType = AllBlockEntities.TRACK_43KG_BOGEY.get();
         event.registerBlockEntityRenderer(bogeyType, BogeyBlockEntityRenderer::new);
+
+        // 节点轨道：曲线与轴向箭头都由它画（LOCKED 后方块模型指向 air，没有别的渲染）
+        event.registerBlockEntityRenderer(AllBlockEntities.NODE_TRACK.get(), NodeTrackRenderer::new);
 
         VisualizerRegistry.setVisualizer(bogeyType,
                 new BlockEntityVisualizer<>() {

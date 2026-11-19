@@ -1,6 +1,6 @@
 package com.easttown.text.client;
 
-import com.easttown.text.net.TrainBoxPayload;
+import com.easttown.text.network.TrainBoxPayload;
 
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;

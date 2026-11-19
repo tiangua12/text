@@ -5,7 +5,7 @@ import javax.annotation.Nonnull;
 import org.slf4j.Logger;
 
 import com.easttown.text.command.TextCommands;
-import com.easttown.text.net.TextNetwork;
+import com.easttown.text.network.TextNetwork;
 import com.easttown.text.registry.AllBlockEntities;
 import com.easttown.text.registry.AllBlocks;
 import com.easttown.text.registry.AllCreativeTabs;

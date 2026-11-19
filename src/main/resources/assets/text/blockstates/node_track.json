@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "locked=false": { "model": "text:block/track/node_track" },
+    "locked=true": { "model": "minecraft:block/air" }
+  }
+}

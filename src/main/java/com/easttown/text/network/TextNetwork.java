@@ -1,4 +1,4 @@
-package com.easttown.text.net;
+package com.easttown.text.network;
 
 import com.easttown.text.client.ClientTrainBoxState;
 

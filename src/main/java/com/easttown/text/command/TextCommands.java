@@ -4,7 +4,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
-import com.easttown.text.net.TrainBoxPayload;
+import com.easttown.text.network.TrainBoxPayload;
 import com.easttown.text.util.TrainBoxGeometry;
 import com.simibubi.create.content.contraptions.Contraption;
 import com.simibubi.create.content.trains.entity.CarriageContraptionEntity;
