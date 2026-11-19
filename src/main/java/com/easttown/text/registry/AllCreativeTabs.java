@@ -18,13 +18,14 @@ import net.neoforged.neoforge.registries.DeferredRegister;
  *
  * <p>{@code displayItems} 里只放物品：方块物品本身即可放置，同时再放 block 会产生重复条目。
  */
+@SuppressWarnings("null")
 public final class AllCreativeTabs {
 
-    @SuppressWarnings("null")
+
     public static final DeferredRegister<CreativeModeTab> TABS =
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, Text.MODID);
 
-    @SuppressWarnings("null")
+
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TEXT = TABS.register("text",
             () -> CreativeModeTab.builder()
                     .title(Component.translatable("itemGroup.text"))

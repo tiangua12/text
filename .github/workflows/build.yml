@@ -5,26 +5,54 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
+    # 打 tag 时要创建 Release，需要写权限。GITHUB_TOKEN 默认是只读的。
+    # 作用域限定在 job 级，比写在文件顶层更小。fork PR 的 token 本来就只读，
+    # 而下面的发布步骤带 tag 条件，PR 事件压根不会走到那里。
+    permissions:
+      contents: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           fetch-tags: true
 
       - name: Setup JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           java-version: '21'
           distribution: 'temurin'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
-      # This is needed to be able to run ./gradlew below
-      # You can run `git update-index --chmod +x gradlew` then remove this step.
+      # 兜底：仓库里 gradlew 的可执行位如果丢了（Windows 上常见），CI 直接
+      # ./gradlew 会 permission denied。这行 chmod 保留，代价可忽略。
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
 
+      # 注意：项目的 gradle.properties 只应包含「对 CI 也成立」的配置。
+      # 本机代理 / 本机 JDK 路径等机器专属设置必须留在
+      # ~/.gradle/gradle.properties（不提交），否则 CI 会把依赖请求
+      # 发给一个不存在的内网代理，10 秒超时后整轮失败。
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./gradlew build --stacktrace --warning-mode all
+
+      - name: Upload build artifact
+        if: success()
+        uses: actions/upload-artifact@v7
+        with:
+          name: text-jar
+          path: build/libs/*.jar
+          if-no-files-found: warn
+
+      # 只有推 tag（如 v1.0.0）才建 Release。普通 push / PR 跳过这一步。
+      # generate_release_notes 会用 commit 和 PR 自动生成更新说明。
+      # fail_on_unmatched_files 防止版本号改了名却静默生成一个空 Release。
+      - name: Attach jar to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v3
+        with:
+          files: build/libs/*.jar
+          generate_release_notes: true
+          fail_on_unmatched_files: true

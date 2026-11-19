@@ -1,5 +1,7 @@
 package com.easttown.text.registry;
 
+import javax.annotation.Nonnull;
+
 import com.easttown.text.Text;
 import com.easttown.text.content.bogey.Track43kgBogeyBlockEntity;
 
@@ -39,7 +41,7 @@ public final class AllBlockEntities {
                 return type;
             });
 
-    public static void register(IEventBus modEventBus) {
+    public static void register(@Nonnull     IEventBus modEventBus) {
         BLOCK_ENTITY_TYPES.register(modEventBus);
     }
 

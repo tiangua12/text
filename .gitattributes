@@ -3,3 +3,10 @@
 # are changed when only line endings change.
 src/generated/**/.cache/* text eol=lf
 src/generated/**/*.json text eol=lf
+
+# Gradle wrapper：gradlew 必须入库为 LF + 可执行位，否则 Linux / GitHub Actions
+# 上 `./gradlew` 会报 "/bin/sh^M: bad interpreter" 或 permission denied。
+# 本机 core.autocrlf=true，这里显式钉死，避免不同 clone 配置导致 CI 挂掉。
+gradlew text eol=lf
+gradlew.bat text eol=crlf
+*.sh text eol=lf
