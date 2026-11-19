@@ -1,6 +1,8 @@
 package com.easttown.text.registry;
 
 import com.easttown.text.Text;
+import com.easttown.text.client.Hxd3cBogeyRenderer;
+import com.easttown.text.client.Hxd3cBogeyVisual;
 import com.simibubi.create.content.trains.bogey.BogeySizes;
 import com.simibubi.create.content.trains.bogey.BogeyStyle;
 import com.simibubi.create.content.trains.bogey.StandardBogeyRenderer;
@@ -51,7 +53,7 @@ public final class AllTrackTypes {
             ResourceLocation.fromNamespaceAndPath(Text.MODID, "track_43kg"))
             .displayName(Component.translatable("bogey.style.text.track_43kg"))
             .size(BogeySizes.SMALL,
-                    () -> AllTracks.TRACK_43KG_BOGEY_BLOCK.get(),
+                    () -> AllBlocks.TRACK_43KG_BOGEY.get(),
                     () -> () -> new BogeyStyle.SizeRenderer(
                             new StandardBogeyRenderer.Small(), StandardBogeyVisual.Small::new))
             .build();
@@ -66,7 +68,7 @@ public final class AllTrackTypes {
             ResourceLocation.fromNamespaceAndPath(Text.MODID, "track_43kg"))
             .displayName(Component.translatable("bogey.style.text.track_43kg_large"))
             .size(BogeySizes.LARGE,
-                    () -> AllTracks.TRACK_43KG_LARGE_BOGEY_BLOCK.get(),
+                    () -> AllBlocks.TRACK_43KG_LARGE_BOGEY.get(),
                     () -> () -> new BogeyStyle.SizeRenderer(
                             new StandardBogeyRenderer.Large(), StandardBogeyVisual.Large::new))
             .build();
@@ -81,11 +83,11 @@ public final class AllTrackTypes {
             ResourceLocation.fromNamespaceAndPath(Text.MODID, "track_43kg"))
             .displayName(Component.translatable("bogey.style.text.hxd3c"))
             .size(BogeySizes.SMALL,
-                    () -> AllTracks.TRACK_43KG_BOGEY_BLOCK.get(),
+                    () -> AllBlocks.TRACK_43KG_BOGEY.get(),
                     () -> () -> new BogeyStyle.SizeRenderer(
                             new Hxd3cBogeyRenderer(), Hxd3cBogeyVisual::new))
             .size(BogeySizes.LARGE,
-                    () -> AllTracks.TRACK_43KG_LARGE_BOGEY_BLOCK.get(),
+                    () -> AllBlocks.TRACK_43KG_LARGE_BOGEY.get(),
                     () -> () -> new BogeyStyle.SizeRenderer(
                             new Hxd3cBogeyRenderer(), Hxd3cBogeyVisual::new))
             .build();

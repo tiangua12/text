@@ -1,4 +1,4 @@
-package com.easttown.text.registry;
+package com.easttown.text.client;
 
 import com.easttown.text.Text;
 import com.mojang.blaze3d.vertex.PoseStack;

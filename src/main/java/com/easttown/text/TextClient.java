@@ -1,7 +1,7 @@
 package com.easttown.text;
 
-import com.easttown.text.registry.AllTracks;
-import com.easttown.text.registry.Track43kgBogeyBlockEntity;
+import com.easttown.text.content.bogey.Track43kgBogeyBlockEntity;
+import com.easttown.text.registry.AllBlockEntities;
 import com.simibubi.create.CreateClient;
 import com.simibubi.create.content.trains.bogey.BogeyBlockEntityRenderer;
 import com.simibubi.create.content.trains.bogey.BogeyBlockEntityVisual;
@@ -36,7 +36,7 @@ public class TextClient {
      */
     @SuppressWarnings("null")
     private static void registerBogeyRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        var bogeyType = AllTracks.TRACK_43KG_BOGEY_BE.get();
+        var bogeyType = AllBlockEntities.TRACK_43KG_BOGEY.get();
         event.registerBlockEntityRenderer(bogeyType, BogeyBlockEntityRenderer::new);
 
         VisualizerRegistry.setVisualizer(bogeyType,

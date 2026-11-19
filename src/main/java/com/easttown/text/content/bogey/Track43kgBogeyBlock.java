@@ -1,7 +1,9 @@
-package com.easttown.text.registry;
+package com.easttown.text.content.bogey;
 
 import javax.annotation.Nonnull;
 
+import com.easttown.text.registry.AllBlockEntities;
+import com.easttown.text.registry.AllTrackTypes;
 import com.simibubi.create.content.trains.bogey.BogeySizes;
 import com.simibubi.create.content.trains.bogey.BogeyStyle;
 import com.simibubi.create.content.trains.bogey.StandardBogeyBlock;
@@ -45,7 +47,7 @@ public class Track43kgBogeyBlock extends StandardBogeyBlock {
 
     @Override
     public BlockEntityType<? extends StandardBogeyBlockEntity> getBlockEntityType() {
-        return AllTracks.TRACK_43KG_BOGEY_BE.get();
+        return AllBlockEntities.TRACK_43KG_BOGEY.get();
     }
 
     /**

@@ -27,8 +27,8 @@ import net.minecraft.resources.ResourceLocation;
  *
  * <p>Static-init ordering (R5): the block supplier is a <em>double</em> lazy —
  * the outer {@code NonNullSupplier.lazy} defers creating the inner lazy, and the
- * inner lazy defers {@code AllTracks.TRACK_32KG_BLOCK.get()}. Neither
- * {@code AllTracks} nor {@code AllTrackMaterials} dereferences the other during
+ * inner lazy defers {@code AllBlocks.TRACK_32KG.get()}. Neither
+ * {@code AllBlocks} nor {@code AllTrackMaterials} dereferences the other during
  * class initialisation, so either class may load first safely.
  */
 public final class AllTrackMaterials {
@@ -37,7 +37,7 @@ public final class AllTrackMaterials {
             .make(ResourceLocation.fromNamespaceAndPath(Text.MODID, "track_32kg"))
             .lang("32kg/m Rail")
             .block(NonNullSupplier.lazy(() ->
-                    NonNullSupplier.lazy(() -> AllTracks.TRACK_32KG_BLOCK.get())))
+                    NonNullSupplier.lazy(() -> AllBlocks.TRACK_32KG.get())))
             .particle(ResourceLocation.fromNamespaceAndPath(Text.MODID,
                     "block/track/track_32kg/ascending"))
             .standardModels()
@@ -48,7 +48,7 @@ public final class AllTrackMaterials {
             .make(ResourceLocation.fromNamespaceAndPath(Text.MODID, "track_43kg"))
             .lang("43kg/m Rail")
             .block(NonNullSupplier.lazy(() ->
-                    NonNullSupplier.lazy(() -> AllTracks.TRACK_43KG_BLOCK.get())))
+                    NonNullSupplier.lazy(() -> AllBlocks.TRACK_43KG.get())))
             .particle(ResourceLocation.fromNamespaceAndPath(Text.MODID,
                     "block/track/track_43kg/segment_43kg"))
             .trackType(AllTrackTypes.TRACK_43KG)

@@ -1,4 +1,4 @@
-package com.easttown.text.registry;
+package com.easttown.text.client;
 
 import java.util.function.Consumer;
 

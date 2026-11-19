@@ -1,5 +1,6 @@
-package com.easttown.text.registry;
+package com.easttown.text.content.track;
 
+import com.easttown.text.registry.AllBlocks;
 import com.simibubi.create.content.trains.track.TrackBlock;
 import com.simibubi.create.content.trains.track.TrackMaterial;
 import com.simibubi.create.content.trains.track.TrackShape;
@@ -40,7 +41,7 @@ public class Track43kgBlock extends TrackBlock {
     @SuppressWarnings("null")
     @Override
     public BlockState getBogeyAnchor(BlockGetter world, BlockPos pos, BlockState state) {
-        return AllTracks.TRACK_43KG_BOGEY_BLOCK.get().defaultBlockState()
+        return AllBlocks.TRACK_43KG_BOGEY.get().defaultBlockState()
                 .setValue(BlockStateProperties.HORIZONTAL_AXIS,
                         state.getValue(SHAPE) == TrackShape.XO ? Direction.Axis.X : Direction.Axis.Z);
     }
