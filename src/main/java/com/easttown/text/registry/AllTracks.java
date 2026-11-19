@@ -22,18 +22,16 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 /**
  * Block / Item / CreativeTab / BlockEntityType registrations.
  */
+@SuppressWarnings("null")
 public final class AllTracks {
 
         public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(Text.MODID);
         public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(Text.MODID);
-        @SuppressWarnings("null")
         public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES =
                         DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, Text.MODID);
-        @SuppressWarnings("null")
         public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister
                         .create(Registries.CREATIVE_MODE_TAB, Text.MODID);
 
-        @SuppressWarnings("null")
         public static final DeferredHolder<Block, TrackBlock> TRACK_32KG_BLOCK = BLOCKS.register(
                         "track_32kg", () -> new TrackBlock(
                                         BlockBehaviour.Properties.of()
@@ -48,7 +46,6 @@ public final class AllTracks {
                         "track_32kg", () -> new TrackBlockItem(TRACK_32KG_BLOCK.get(), new Item.Properties()));
 
         /** 铁轨43kg/米：方块属性与 32kg 一致（参照 create AllBlocks.TRACK）。 */
-        @SuppressWarnings("null")
         public static final DeferredHolder<Block, Track43kgBlock> TRACK_43KG_BLOCK = BLOCKS.register(
                         "track_43kg", () -> new Track43kgBlock(
                                         BlockBehaviour.Properties.of()
@@ -63,43 +60,38 @@ public final class AllTracks {
                         "track_43kg", () -> new TrackBlockItem(TRACK_43KG_BLOCK.get(), new Item.Properties()));
 
         /** 43kg 轨距专用转向架（小号）：真正独立的转向架方块，只在 43kg 轨道上兼容。 */
-        @SuppressWarnings("null")
         public static final DeferredHolder<Block, Track43kgBogeyBlock> TRACK_43KG_BOGEY_BLOCK = BLOCKS.register(
                         "track_43kg_bogey", () -> new Track43kgBogeyBlock(
                                         BlockBehaviour.Properties.of()
                                                         .mapColor(MapColor.METAL)
                                                         .strength(0.8f)
                                                         .sound(SoundType.NETHERITE_BLOCK)
-                                                        .noOcclusion()
+                                                        .noOcclusion(),
                                                         // 无碰撞箱：玩家/实体可穿过；getShape 仍是完整方块，
                                                         // 射线检测可命中 → 能正常点击破坏、扳手交互
-                                                        .noCollission(),
+                                                      //  .noCollission(),
                                         BogeySizes.SMALL));
 
-        @SuppressWarnings("null")
         public static final DeferredHolder<Item, Item> TRACK_43KG_BOGEY_ITEM = ITEMS.register(
                         "track_43kg_bogey", () -> new BlockItem(
                                         TRACK_43KG_BOGEY_BLOCK.get(), new Item.Properties()));
 
         /** 43kg 轨距专用转向架（大号）。 */
-        @SuppressWarnings("null")
         public static final DeferredHolder<Block, Track43kgBogeyBlock> TRACK_43KG_LARGE_BOGEY_BLOCK = BLOCKS.register(
                         "track_43kg_large_bogey", () -> new Track43kgBogeyBlock(
                                         BlockBehaviour.Properties.of()
                                                         .mapColor(MapColor.METAL)
                                                         .strength(0.8f)
                                                         .sound(SoundType.NETHERITE_BLOCK)
-                                                        .noOcclusion()
-                                                        .noCollission(),
+                                                        .noOcclusion(),
+                                                      //  .noCollission(),
                                         BogeySizes.LARGE));
 
-        @SuppressWarnings("null")
         public static final DeferredHolder<Item, Item> TRACK_43KG_LARGE_BOGEY_ITEM = ITEMS.register(
                         "track_43kg_large_bogey", () -> new net.minecraft.world.item.BlockItem(
                                         TRACK_43KG_LARGE_BOGEY_BLOCK.get(), new Item.Properties()));
 
         /** 43kg 转向架专用 BE 类型：validBlocks 只含 43kg 转向架方块。 */
-        @SuppressWarnings("null")
         public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<Track43kgBogeyBlockEntity>> TRACK_43KG_BOGEY_BE =
                         BLOCK_ENTITY_TYPES.register("track_43kg_bogey", () -> {
                                 BlockEntityType<Track43kgBogeyBlockEntity> type = BlockEntityType.Builder
@@ -111,7 +103,6 @@ public final class AllTracks {
                                 return type;
                         });
 
-        @SuppressWarnings("null")
         public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TEXT_TAB = TABS.register(
                         "text", () -> CreativeModeTab.builder()
                                         .title(Component.translatable("itemGroup.text"))
