@@ -4,7 +4,6 @@ import com.easttown.text.Text;
 import com.easttown.text.content.bogey.Track43kgBogeyBlock;
 import com.easttown.text.content.track.Track43kgBlock;
 import com.simibubi.create.content.trains.bogey.BogeySizes;
-import com.simibubi.create.content.trains.track.TrackBlock;
 
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
@@ -25,34 +24,39 @@ import net.neoforged.neoforge.registries.DeferredRegister;
  * 方块构造器需要 {@link AllTrackMaterials} 的实例，因此材料类必须先能加载；
  * 反过来材料类对方块的引用一律走 {@code NonNullSupplier.lazy}（见 AllTrackMaterials javadoc）。
  *
+ * <p>两条轨道都必须用 {@link Track43kgBlock}（而不是 Create 的 {@code TrackBlock}）：
+ * 它覆写 {@code getBogeyAnchor} 返回本模组的转向架。Create 原生实现硬编码
+ * {@code AllBlocks.SMALL_BOGEY}（标准转向架），而本模组两条轨道的轨距是
+ * {@code text:gauge_1435}，与标准转向架的 {@code create:standard} 不兼容——
+ * 用 {@code TrackBlock} 会导致在这两条轨道上装配出注定脱轨的标准转向架。
+ *
  * <p>不启用 {@code noCollission()} 是刻意的：转向架与轨道必须可点击（扳手/右键交互），
  * 无碰撞会让玩家直接穿过方块并破坏它。
  */
+@SuppressWarnings("null")
 public final class AllBlocks {
 
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(Text.MODID);
 
-    @SuppressWarnings("null")
-    public static final DeferredHolder<Block, TrackBlock> TRACK_32KG = BLOCKS.register(
-            "track_32kg", () -> new TrackBlock(
+    /** 32kg/m 轨道。轨距与 43kg 共用 {@code text:gauge_1435}，故同样走 {@link Track43kgBlock}。 */
+    public static final DeferredHolder<Block, Track43kgBlock> TRACK_32KG = BLOCKS.register(
+            "track_32kg", () -> new Track43kgBlock(
                     trackProperties(),
                     AllTrackMaterials.TRACK_32KG));
 
-    @SuppressWarnings("null")
+    /** 43kg/m 轨道。 */
     public static final DeferredHolder<Block, Track43kgBlock> TRACK_43KG = BLOCKS.register(
             "track_43kg", () -> new Track43kgBlock(
                     trackProperties(),
                     AllTrackMaterials.TRACK_43KG));
 
-    /** 43kg 转向架（小号）：只有 43kg 轨距的轨道兼容。 */
-    @SuppressWarnings("null")
+    /** 专用转向架（小号）：只在 {@code text:gauge_1435} 轨距的轨道上兼容。 */
     public static final DeferredHolder<Block, Track43kgBogeyBlock> TRACK_43KG_BOGEY = BLOCKS.register(
             "track_43kg_bogey", () -> new Track43kgBogeyBlock(
                     bogeyProperties(),
                     BogeySizes.SMALL));
 
-    /** 43kg 转向架（大号）。 */
-    @SuppressWarnings("null")
+    /** 专用转向架（大号）。 */
     public static final DeferredHolder<Block, Track43kgBogeyBlock> TRACK_43KG_LARGE_BOGEY = BLOCKS.register(
             "track_43kg_large_bogey", () -> new Track43kgBogeyBlock(
                     bogeyProperties(),

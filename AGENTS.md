@@ -9,13 +9,19 @@
 
 `text` 是一个 **Minecraft 1.21.1 / NeoForge 的 Create 附属模组**，核心内容是中国铁路风格的**轨道与转向架**：
 
-- `text:track_32kg` —— 32kg/m 钢轨（复用 Create 标准轨距 `STANDARD`）
-- `text:track_43kg` —— 43kg/m 钢轨，**自带独立轨距**（自定义 `TrackMaterial.TrackType`）
-- `text:track_43kg_bogey` / `text:track_43kg_large_bogey` —— 43kg 专用转向架（SMALL / LARGE）
+- `text:track_32kg` —— 32kg/m 钢轨，轨距 `text:gauge_1435`
+- `text:track_43kg` —— 43kg/m 钢轨，轨距 `text:gauge_1435`（**与 32kg 共用同一 `TrackType`**）
+- `text:track_43kg_bogey` / `text:track_43kg_large_bogey` —— 专用转向架（SMALL / LARGE）
 - 3 个转向架样式：Create 原版小、原版大、自定义 `hxd3c`（Co-Co 三轴电力机车转向架）
 
-43kg 轨距与 Create 标准轨距**物理不兼容**（不能互转、不能换转向架、不能互相停留），
+**轨距模型**：两种钢轨共用自定义轨距 `text:gauge_1435`（`AllTrackTypes.GAUGE_1435`），
+所以彼此可以互转、共用同一套转向架。Create 的 `create:standard` 是另一个 `TrackType`
+对象，与本模组轨距**物理不兼容**（不能互转、不能换转向架、不能互相停留），
 靠 13 个 mixin 在 Create 内部加装，是整个模组最容易踩坏的部分。
+
+> Create 的 `TrackType` **没有轨距数值字段**，只有 `id` + `factory`，判定一律用引用相等。
+> 「1435mm」这个数只活在渲染层（`BezierConnection` 硬编码 ±0.965，已由 mixin 改成
+> 1435mm 对应偏移）。**改轨距 = 改 `TrackType` 引用，不是改数字。**
 
 代码只有 29 个类，但**概念**有 6 个（轨道材料、轨距类型、轨道方块、转向架、轨图持久化、曲线碰撞）。
 
@@ -32,7 +38,7 @@
 | 硬依赖 | Create `6.0.10-281`（`slim`, `transitive=false`） | `dependencies` |
 | 传递依赖（手动声明） | Ponder `1.0.82`、Flywheel `1.0.6`（compileOnly API + runtimeOnly）、Registrate `MC1.21-1.3.0+67` | 同上 |
 | mod id / 包 | `text` / `com.easttown.text` | `gradle.properties` |
-| 产物 | `build/libs/text-1.0.0.jar` | `mod_id` + `mod_version` |
+| 产物 | `build/libs/text-1.1.0.jar` | `mod_id` + `mod_version` |
 
 Create 用的是 `slim` + `transitive = false`：**它的传递依赖不会自动进来**，删掉
 `ponder` / `flywheel` / `registrate` 任意一行都会立刻编译失败。
@@ -53,7 +59,7 @@ Create 用的是 `slim` + `transitive = false`：**它的传递依赖不会自�
 
 验证产物：
 ```powershell
-jar tf build/libs/text-1.0.0.jar | Select-String 'assets/text|data/create/tags|text.mixins.json'
+jar tf build/libs/text-1.1.0.jar | Select-String 'assets/text|data/create/tags|text.mixins.json'
 ```
 
 ### 环境约束（踩过）
@@ -77,6 +83,33 @@ jar tf build/libs/text-1.0.0.jar | Select-String 'assets/text|data/create/tags|t
 - 构建目录已有历史产物（`build/` ≈100 MB，`run/` ≈28 MB），都在 `.gitignore` 里，别提交。
 - 读中文文件**用 read / grep 工具**，不要用 shell `Get-Content`（输出层编码会把中文变成乱码）。
 
+### CI（GitHub Actions）
+
+工作流只有一个：`.github/workflows/build.yml`。**它跑的是和本地完全相同的 `./gradlew build`**，
+唯一差异来自 `~/.gradle/gradle.properties`（CI 上没有，也不需要）。
+
+| 触发 | 行为 |
+|---|---|
+| push（任意分支） | 构建 + 上传 artifact `text-jar`（`build/libs/*.jar`） |
+| pull_request | 同上，但不进 Release 步骤（token 只读，且该步骤带 tag 条件） |
+| push tag（`v*`） | 构建 + 上传 artifact + **自动建 GitHub Release**，附 jar 并自动生成 release notes |
+
+流水线要点：
+
+- `actions/checkout@v7` 带 `fetch-depth: 0` + `fetch-tags: true` —— release notes 需要完整历史与 tag。
+- `actions/setup-java@v6`（temurin 21）装的就是 `JAVA_HOME`，toolchain 直接命中，
+  所以仓库里**不需要** `org.gradle.java.installations.paths`。
+- 构建命令固定 `./gradlew build --stacktrace --warning-mode all`：前者让失败可定位，
+  后者把 Gradle 弃用警告暴露出来（当前有 Gradle 10 相关的 deprecation）。
+- `chmod +x ./gradlew` 是兜底：Windows 上提交的 `gradlew` 可能丢可执行位。
+- 权限只给 job 级 `contents: write`（Release 需要），不要提到文件顶层。
+- `fail_on_unmatched_files: true`：版本号改了名却匹配不到 jar 时宁可失败，也不产生空 Release。
+
+**CI 挂掉的第一嫌疑永远是仓库里的机器专属配置**。症状：`exit code 1` +
+`No Gradle build results detected` + `timeout (10000ms)` —— 说明依赖请求发给了一个不可达的内网地址。
+仓库的 `gradle.properties` 只允许放"对 CI 也成立"的东西（版本号、编译选项）；
+代理、本机 JDK 路径一律留在用户级文件里。
+
 ## 4. 硬约束（违反即坏）
 
 ### 4.1 三条架构硬约束
@@ -84,7 +117,7 @@ jar tf build/libs/text-1.0.0.jar | Select-String 'assets/text|data/create/tags|t
 | # | 约束 | 后果 |
 |---|---|---|
 | C1 | Create 没有提供"新轨距 / 新转向架 / 新轨图存储"的公开扩展点 | 只能继承 + 13 个 mixin 改内部行为；**mixin 是架构的一等公民，不是补丁** |
-| C2 | 43kg 轨距必须与 `STANDARD` **物理隔离**（不能转向、不能换样式、不能搬车），但运行时列车/信号/车站必须仍从 `Create.RAILWAYS.trackNetworks` 查图 | 隔离靠 4 个"入口拦截"mixin；存储靠"运行时合并、持久化分离" |
+| C2 | 本模组轨距 `text:gauge_1435`（32kg + 43kg 共用）必须与 Create 的 `create:standard` **物理隔离**（不能转向、不能换样式、不能搬车），但运行时列车/信号/车站必须仍从 `Create.RAILWAYS.trackNetworks` 查图 | 隔离靠 4 个"入口拦截"mixin；存储靠"运行时合并、持久化分离" |
 | C3 | 轨道方块必须复用 Create 的 `AllBlockEntityTypes.TRACK` + `TrackBlockEntity` | 轨道方块只能继承 `TrackBlock`，不得注册新轨道 BE；只有转向架允许自有 BE |
 
 ### 4.2 R-JVM（违反即 `IllegalClassLoadError`）
@@ -103,10 +136,10 @@ jar tf build/libs/text-1.0.0.jar | Select-String 'assets/text|data/create/tags|t
 | 场景 | 拦截者 | 原版行为 | 失败表现（若移除） |
 |---|---|---|---|
 | 轨道边转向 | `TrackEdgeGaugeMixin.canTravelTo(RETURN)` | 只查方向对齐 | 列车在节点处拐进异轨距 |
-| 扳手切换转向架样式 | `BogeyStyleGaugeMixin.useItemOn(HEAD)` | 组内循环切换 | 43kg 车变标准转向架、凭空"换轨距" |
+| 扳手切换转向架样式 | `BogeyStyleGaugeMixin.useItemOn(HEAD)` | 组内循环切换 | 本模组车变标准转向架、凭空"换轨距" |
 | 扳手搬迁列车 | `TrainRelocatorGaugeMixin.relocate(HEAD)` | 不查目标轨距 | 整列车被搬到异轨距轨道 |
 | 行驶中不兼容 | `TrainDerailMixin.tick(TAIL)` | 仅 `blocked`（下 tick 可被输入恢复） | 车在异轨距上"慢慢挪" |
-| 装配转向架 | `Track43kgBlock.getBogeyAnchor`（覆写，非 mixin） | 硬编码标准转向架 | 43kg 轨道上装出标准转向架 |
+| 装配转向架 | `Track43kgBlock.getBogeyAnchor`（覆写，非 mixin） | 硬编码标准转向架 | 本模组轨道上装出标准转向架 |
 
 ## 5. 现状坐标
 
@@ -212,31 +245,48 @@ src/main/templates/META-INF/neoforge.mods.toml   # generateModMetadata 展开变
 
 ## 9. 交付前检查
 
-1. `.\gradlew.bat build` 0 error；`build/libs/text-1.0.0.jar` 时间戳刷新。
+1. `.\gradlew.bat build` 0 error；`build/libs/text-1.1.0.jar` 时间戳刷新。
 2. jar 内抽查：`assets/text/blockstates/track_43kg.json`、`assets/text/models/block/track/*.obj`、`text.mixins.json`、`data/create/tags/block/tracks.json`。
 3. 结构类改动额外核验：
    - `text.mixins.json` 的 `mixins` 条数 == 带 `@Mixin` 的类数；`package` 字段与目录一致。
    - 移动式重构：jar 内文件清单与改动前**逐条 diff 应完全一致**。
-4. `runClient` 冒烟：创造页四件物品齐；直/斜/十字/上升/传送形态渲染正常；曲线（BE 部分）无紫黑缺失纹理；43kg 与标准轨在**转、换、搬、开**四个入口都被拦；挖掘掉落正确（转向架掉 `create:railway_casing`）；控制台无 `Exception loading blockstate definition`、无 `Missing model`、无 mixin 应用失败日志。
-5. 存档往返：放 43kg 线 → 退出 → `create_tracks` 里**没有** 43kg 图、`text_track_43kg` 里有 → 重进存档列车不脱轨。
+4. `runClient` 冒烟：创造页四件物品齐；直/斜/十字/上升/传送形态渲染正常；曲线（BE 部分）无紫黑缺失纹理；**32kg 与 43kg 之间能自由转、换、搬、开（同轨距）**，而**本模组轨距与 Create 标准轨在转、换、搬、开四个入口都被拦**；挖掘掉落正确（转向架掉 `create:railway_casing`）；控制台无 `Exception loading blockstate definition`、无 `Missing model`、无 mixin 应用失败日志。
+5. 存档往返：放一条 32kg + 43kg 互连的线 → 退出 → `create_tracks` 里**没有**它的图、`text_track_43kg` 里有 → 重进存档列车不脱轨、能跨 32kg/43kg 行驶。
 6. 改了 mixin：确认已登记，并看 `run/.mixin.out/`（`-Dmixin.debug.export=true` 已开）里的导出类确认注入落地。
 
 ## 10. 已知缺口（发布前处理）
 
-1. **`neoforge.mods.toml` 没有声明 Create 依赖**（目前只有 `neoforge` + `minecraft`）。发布前在 `src/main/templates/META-INF/neoforge.mods.toml` 补：
-
-   ```toml
-   [[dependencies.${mod_id}]]
-       modId="create"
-       type="required"
-       versionRange="[6.0.10,)"
-       ordering="NONE"
-       side="BOTH"
-   ```
+1. ~~**`neoforge.mods.toml` 没有声明 Create 依赖**~~ **已补齐**：文件末尾已声明
+   `modId="create" type="required" versionRange="[6.0.10,)"`。升级 Create 时同步这里与
+   `gradle.properties: create_version`，两处版本要一起动。
 2. `Config.onConfigEvent` 用反射调用 `ChunkMap#getChunks()`（protected），依赖 NeoForge 模块开放；升级 MC 版本时首批复查。
 3. `run/mods/` 只有两个 Sodium jar（客户端性能测试）；Create 与 Ponder/Flywheel 走 dev classpath，不要把它们的 jar 丢进 `run/mods/`。
 4. `.verify_*` 目录是历史验证残留，已 gitignore，可安全删除。
 5. `PLAN.md` 是 32kg 轨道那一阶段的完整设计记录，涉及轨道/模型细节时值得先读。
+
+## 11. 发版流程
+
+发布由 CI 的 tag 步骤完成，本地不需要 `publish`、也不需要手动上传。
+
+```bash
+# 1) 改版本号（唯一版本源）
+#    gradle.properties: mod_version=1.1.0
+# 2) 本地先确认构建干净
+.\gradlew.bat build
+# 3) 提交并打 tag（tag 名必须以 v 开头，与工作流条件 startsWith(github.ref, 'refs/tags/') 匹配）
+git add -A
+git commit -m "release: v1.1.0"
+git tag v1.1.0
+git push origin main --tags
+# 4) CI 跑完 → Releases 页面出现 v1.1.0，附件是 text-1.1.0.jar
+```
+
+注意：
+
+- **`mod_version` 与 tag 名之间没有强制校验**。工作流只校验"jar 文件能匹配到"
+  （`fail_on_unmatched_files`），不会比对版本号。打错 tag 会得到版本号与 tag 不一致的 Release。
+- 产物名固定 `text-${mod_version}.jar`（`build.gradle` 的 `base.archivesName = mod_id`）。
+- release notes 由 commit / PR 自动生成；想让人读得懂，就在打 tag 前把 PR 标题和 commit message 写清楚。
 
 ---
 

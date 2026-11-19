@@ -48,7 +48,7 @@ public class TextTrackSavedData extends SavedData {
         // 43kg 图始终从全局网络提取（运行时图与标准轨道图物理隔离，见 Track43kgBlock）
         DimensionPalette dimensions = new DimensionPalette();
         nbt.put(KEY_GRAPHS, NBTHelper.writeCompoundList(
-                extract43kgGraphs(Create.RAILWAYS.trackNetworks.values()), tg -> tg.write(registries, dimensions)));
+                extractCustomGaugeGraphs(Create.RAILWAYS.trackNetworks.values()), tg -> tg.write(registries, dimensions)));
         dimensions.write(nbt);
         return nbt;
     }
@@ -75,23 +75,31 @@ public class TextTrackSavedData extends SavedData {
                 .computeIfAbsent(factory(), NAME);
     }
 
-    /** 判断一张图是否属于 43kg 轨距：存在任意一条 43kg 材料边。 */
-    public static boolean is43kgGraph(TrackGraph graph) {
+    /**
+     * 判断一张图是否属于本模组轨距（{@code text:gauge_1435}）：存在任意一条该轨距的边。
+     *
+     * <p>32kg 与 43kg 共用同一轨距，因此<b>两种轨道的图都会被分离到本文件</b>——
+     * 它们在轨距判定上是同一个网络。
+     *
+     * <p>文件名保留 {@code text_track_43kg}：改名会让老存档里的 43kg 图读不出来。
+     */
+    public static boolean isCustomGaugeGraph(TrackGraph graph) {
         for (TrackNodeLocation loc : graph.getNodes()) {
             TrackNode node = graph.locateNode(loc);
             if (node == null)
                 continue;
             for (TrackEdge edge : graph.getConnectionsFrom(node).values())
-                if (edge.getTrackMaterial() != null && edge.getTrackMaterial().trackType == AllTrackTypes.TRACK_43KG)
+                if (edge.getTrackMaterial() != null
+                        && edge.getTrackMaterial().trackType == AllTrackTypes.GAUGE_1435)
                     return true;
         }
         return false;
     }
 
-    private static Iterable<TrackGraph> extract43kgGraphs(Iterable<TrackGraph> all) {
+    private static Iterable<TrackGraph> extractCustomGaugeGraphs(Iterable<TrackGraph> all) {
         java.util.List<TrackGraph> out = new java.util.ArrayList<>();
         for (TrackGraph g : all)
-            if (is43kgGraph(g))
+            if (isCustomGaugeGraph(g))
                 out.add(g);
         return out;
     }

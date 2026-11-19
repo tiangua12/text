@@ -35,7 +35,7 @@ public class Track43kgBogeyBlock extends StandardBogeyBlock {
 
     @Override
     public TrackMaterial.TrackType getTrackType(BogeyStyle style) {
-        return AllTrackTypes.TRACK_43KG;
+        return AllTrackTypes.GAUGE_1435;
     }
 
     @Override
