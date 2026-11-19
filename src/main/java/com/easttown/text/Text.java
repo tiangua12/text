@@ -4,6 +4,8 @@ import javax.annotation.Nonnull;
 
 import org.slf4j.Logger;
 
+import com.easttown.text.command.TextCommands;
+import com.easttown.text.net.TextNetwork;
 import com.easttown.text.registry.AllBlockEntities;
 import com.easttown.text.registry.AllBlocks;
 import com.easttown.text.registry.AllCreativeTabs;
@@ -14,6 +16,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.config.ModConfig;
+import net.neoforged.neoforge.common.NeoForge;
 
 @Mod(Text.MODID)
 public class Text {
@@ -34,5 +37,8 @@ public class Text {
         AllBlockEntities.register(modEventBus);
         AllCreativeTabs.register(modEventBus);
         modEventBus.addListener(Config::onConfigEvent);
+        // /textbox 指令与列车碰撞盒显示用的自定义包
+        modEventBus.addListener(TextNetwork::register);
+        NeoForge.EVENT_BUS.addListener(TextCommands::register);
     }
 }

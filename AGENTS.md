@@ -23,7 +23,7 @@
 > 「1435mm」这个数只活在渲染层（`BezierConnection` 硬编码 ±0.965，已由 mixin 改成
 > 1435mm 对应偏移）。**改轨距 = 改 `TrackType` 引用，不是改数字。**
 
-代码只有 29 个类，但**概念**有 6 个（轨道材料、轨距类型、轨道方块、转向架、轨图持久化、曲线碰撞）。
+代码只有 35 个类，但**概念**有 7 个（轨道材料、轨距类型、轨道方块、转向架、轨图持久化、曲线碰撞、碰撞盒调试）。
 
 ## 2. 技术栈（改动前必看）
 
@@ -156,9 +156,13 @@ src/main/java/com/easttown/text/
 │   ├── track/Track43kgBlock.java
 │   └── bogey/Track43kgBogeyBlock.java, Track43kgBogeyBlockEntity.java
 ├── client/Hxd3cBogeyRenderer.java, Hxd3cBogeyVisual.java
+│          TrainBoxRenderer.java, ClientTrainBoxState.java   # /textbox 线框（仅客户端）
+├── command/TextCommands.java  # /textbox 调试指令
+├── net/TextNetwork.java, TrainBoxPayload.java   # 服务端→客户端的开关包
 ├── mixin/                     # 13 个，契约见 §5.2
 ├── data/TextTrackSavedData.java
 └── util/TrackCurveCollisionHelper.java   # 实际是"mixin 可调用的服务层"（R-JVM）
+         TrainBoxGeometry.java              # 车厢碰撞盒几何（双端共用）
 src/main/resources/
 ├── text.mixins.json           # mixin 必须在此登记（defaultRequire: 1）
 ├── assets/text/{blockstates,models,textures,lang}
@@ -210,8 +214,43 @@ src/main/templates/META-INF/neoforge.mods.toml   # generateModMetadata 展开变
 - **P0-5** 注册层成环无编译期保护
 - **P0-6** R-JVM 无机械化保护
 - **P1-1** `AllTrackTypes` 名不副实
-- **P1-3** `util/` 只有 1 个类，身份是"mixin 服务层"不是通用工具
+- **P1-3** `util/` 身份混杂：`TrackCurveCollisionHelper` 是"mixin 服务层"（R-JVM 约束逼出来的），
+  `TrainBoxGeometry` 是双端共用的纯几何计算——两者定位不同，新工具类别无脑往里塞
 - **P1-4** 三套命名前缀（`All*` / `Track43kg*` / `Hxd3c*`）没有明文约定
+
+### 5.5 调试指令 `/textbox`
+
+限权限等级 2（OP）。开关状态是**客户端位掩码**，服务端只下发"切哪一层"，多人下每人独立。
+
+| 子命令 | 对应位 | 画什么 |
+|---|---|---|
+| `/textbox`（默认） / `boxes` | `FLAG_BOXES` | **不规则碰撞体（青）**：逐方块碰撞形状 |
+| `/textbox hull` | `FLAG_HULL` | 整体外框 OBB（黄），仅定位 |
+| `/textbox aabb` | `FLAG_AABB` | 实体碰撞箱（绿） |
+| `/textbox off` | `OP_ALL_OFF` | 全关 |
+| `/textbox dump` | — | 打印每节车厢的方块数 / 碰撞盒数 / 包围盒数值 |
+
+**"不规则碰撞体"才是 Create 真正拿来判定碰撞的几何**（6.0.10 源码核对）：
+
+`Contraption#invalidateColliders()` 遍历 `blocks`，对每个方块取
+`info.state().getCollisionShape(collisionLevel, localPos, CollisionContext.empty())`，
+再用 `collisionShape.forAllBoxes(populate)` 拆成若干 AABB，连同方块偏移塞进
+`CollisionList`（扁平 double 数组 `centerX/Y/Z + extentsX/Y/Z`）。楼梯、台阶、栅栏因此
+保留本来的形状。`/textbox` 直接读这份现成缓存（`Contraption.getSimplifiedEntityColliders()`），
+不重算形状——重算需要 contraption 自己的假世界，外部拿不到。
+
+**三种"碰撞"不要混为一谈**：
+
+| 层 | 实现 | 参与实际判定吗 |
+|---|---|---|
+| 车厢 ↔ 方块 / 装置侧碰撞 | 逐方块 `getCollisionShape` 拆盒（上面那套） | **是**，不规则 |
+| 列车 ↔ 列车 | `Train#collideWithOtherTrains`：车厢中心**线段** + `0.125` 格半径球（`VecHelper.intersect` / `intersectSphere(..., .125f)`） | **是**，但很粗，没有盒子 |
+| 实体碰撞箱 / 渲染包围盒 | `getBoundingBox()` / `createRenderBoundingBox().inflate(2)` | AABB 只做实体碰撞与视锥裁剪；OBB 外框纯参考 |
+
+改这块时注意：
+- `OrientedBB.extents` 是**包私有且没有 getter**（只有 `getCenter()` / `getRotation()`），别想着读 Create 那个类的尺寸。
+- 小盒变换后用 **8 个角点连 12 条棱**，不要转成世界 AABB——车厢在弯道上是斜的，轴对齐会把盒子撑大、转角失真。
+- 一个车厢可能上百个盒子，绘制有距离剔除（128 格），别去掉。
 
 ## 6. 代码约定
 

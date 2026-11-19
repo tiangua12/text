@@ -1,5 +1,6 @@
 package com.easttown.text;
 
+import com.easttown.text.client.TrainBoxRenderer;
 import com.easttown.text.content.bogey.Track43kgBogeyBlockEntity;
 import com.easttown.text.registry.AllBlockEntities;
 import com.simibubi.create.CreateClient;
@@ -19,6 +20,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import net.neoforged.neoforge.common.NeoForge;
 
 @Mod(value = Text.MODID, dist = Dist.CLIENT)
 public class TextClient {
@@ -28,6 +30,8 @@ public class TextClient {
         IEventBus modBus = container.getEventBus();
         if (modBus != null)
             modBus.addListener(TextClient::registerBogeyRenderers);
+        // /textbox 的线框走游戏总线（RenderLevelStageEvent 在 NeoForge.EVENT_BUS 上）
+        NeoForge.EVENT_BUS.addListener(TrainBoxRenderer::onRenderLevel);
     }
 
     /**
