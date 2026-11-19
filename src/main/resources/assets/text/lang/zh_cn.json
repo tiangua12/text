@@ -7,5 +7,7 @@
   "block.text.node_track": "节点轨道",
   "bogey.style.text.track_43kg": "铁轨43kg/米小型转向架样式",
   "bogey.style.text.track_43kg_large": "铁轨43kg/米大型转向架样式",
-  "bogey.style.text.hxd3c": "HXD3C电力集成转向架样式"
+  "bogey.style.text.hxd3c": "HXD3C电力集成转向架样式",
+  "text.gui.carriage_offset": "装配高度偏移",
+  "text.gui.carriage_offset.tooltip": "组装后车厢整体的上下偏移（单位：格）。正值抬高车体，转向架的轮对仍压在钢轨上。"
 }

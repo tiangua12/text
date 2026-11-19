@@ -8,6 +8,8 @@
   "bogey.style.text.track_43kg": "43kg/m Small Bogey Style",
   "bogey.style.text.track_43kg_large": "43kg/m Large Bogey Style",
   "bogey.style.text.hxd3c": "HXD3C Electric Bogey Style",
+  "text.gui.carriage_offset": "Height Offset",
+  "text.gui.carriage_offset.tooltip": "Vertical offset of the assembled carriage, in blocks. Positive lifts the body; the bogey wheels stay on the rails.",
 
   "text.configuration.title": "Text Configs",
   "text.configuration.section.text.common.toml": "Text Configs",

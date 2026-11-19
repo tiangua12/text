@@ -3,6 +3,7 @@ package com.easttown.text.registry;
 import com.easttown.text.Text;
 import com.easttown.text.client.Hxd3cBogeyRenderer;
 import com.easttown.text.client.Hxd3cBogeyVisual;
+
 import com.simibubi.create.content.trains.bogey.BogeySizes;
 import com.simibubi.create.content.trains.bogey.BogeyStyle;
 import com.simibubi.create.content.trains.bogey.StandardBogeyRenderer;
@@ -64,8 +65,9 @@ public final class AllTrackTypes {
             ResourceLocation.fromNamespaceAndPath(Text.MODID, "gauge_1435"), TrackBlock::new);
 
     /**
-     * 原版小型转向架样式（仅 SMALL 档）：外观为 Create 标准小转向架
-     * （StandardBogeyRenderer.Small / StandardBogeyVisual.Small），
+     * 原版小型转向架样式（仅 SMALL 档）：外观为 Create 标准小转向架。
+     * 直接使用 Create 原版 {@code StandardBogeyRenderer.Small} / {@code StandardBogeyVisual.Small}，
+     * <b>不做任何竖直偏移</b>——转向架整体留在原位，只有 contraption（车厢及其碰撞）参与装配偏移。
      * 指向专用小号转向架方块 {@code track_43kg_bogey}。
      */
     public static final BogeyStyle TRACK_43KG_STYLE = new BogeyStyle.Builder(
@@ -79,9 +81,9 @@ public final class AllTrackTypes {
             .build();
 
     /**
-     * 原版大型转向架样式（仅 LARGE 档）：外观为 Create 标准大转向架
-     * （StandardBogeyRenderer.Large / StandardBogeyVisual.Large），
-     * 指向专用大号转向架方块 {@code track_43kg_large_bogey}。
+     * 原版大型转向架样式（仅 LARGE 档）：外观为 Create 标准大转向架。
+     * 同样是 Create 原版 {@code StandardBogeyRenderer.Large} / {@code StandardBogeyVisual.Large}，
+     * 不做偏移。指向专用大号转向架方块 {@code track_43kg_large_bogey}。
      */
     public static final BogeyStyle TRACK_43KG_LARGE_STYLE = new BogeyStyle.Builder(
             ResourceLocation.fromNamespaceAndPath(Text.MODID, "track_43kg_large"),

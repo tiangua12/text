@@ -2,6 +2,7 @@ package com.easttown.text.network;
 
 import com.easttown.text.client.ClientTrainBoxState;
 
+import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -25,12 +26,19 @@ public final class TextNetwork {
 
     public static void register(RegisterPayloadHandlersEvent event) {
         event.registrar(VERSION)
-                .playToClient(TrainBoxPayload.TYPE, TrainBoxPayload.STREAM_CODEC, TextNetwork::handleToggle);
+                .playToClient(TrainBoxPayload.TYPE, TrainBoxPayload.STREAM_CODEC, TextNetwork::handleToggle)
+                .playToServer(StationOffsetPayload.TYPE, StationOffsetPayload.STREAM_CODEC,
+                        TextNetwork::handleStationOffset);
     }
 
     private static void handleToggle(TrainBoxPayload payload, IPayloadContext context) {
         if (FMLEnvironment.dist == Dist.CLIENT)
             ClientTrainBoxState.accept(payload.op());
+    }
+
+    private static void handleStationOffset(StationOffsetPayload payload, IPayloadContext context) {
+        if (context.player() instanceof ServerPlayer player)
+            StationOffsetPayload.apply(payload, player);
     }
 
     private TextNetwork() {

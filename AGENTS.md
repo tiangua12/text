@@ -17,7 +17,7 @@
 **轨距模型**：两种钢轨共用自定义轨距 `text:gauge_1435`（`AllTrackTypes.GAUGE_1435`），
 所以彼此可以互转、共用同一套转向架。Create 的 `create:standard` 是另一个 `TrackType`
 对象，与本模组轨距**物理不兼容**（不能互转、不能换转向架、不能互相停留），
-靠 13 个 mixin 在 Create 内部加装，是整个模组最容易踩坏的部分。
+靠 22 个 mixin 在 Create 内部加装，是整个模组最容易踩坏的部分。
 
 > Create 的 `TrackType` **没有轨距数值字段**，只有 `id` + `factory`，判定一律用引用相等。
 > 「1435mm」这个数只活在渲染层（`BezierConnection` 硬编码 ±0.965，已由 mixin 改成
@@ -116,7 +116,7 @@ jar tf build/libs/text-1.2.0.jar | Select-String 'assets/text|data/create/tags|t
 
 | # | 约束 | 后果 |
 |---|---|---|
-| C1 | Create 没有提供"新轨距 / 新转向架 / 新轨图存储"的公开扩展点 | 只能继承 + 13 个 mixin 改内部行为；**mixin 是架构的一等公民，不是补丁** |
+| C1 | Create 没有提供"新轨距 / 新转向架 / 新轨图存储"的公开扩展点 | 只能继承 + 22 个 mixin 改内部行为；**mixin 是架构的一等公民，不是补丁** |
 | C2 | 本模组轨距 `text:gauge_1435`（32kg + 43kg 共用）必须与 Create 的 `create:standard` **物理隔离**（不能转向、不能换样式、不能搬车），但运行时列车/信号/车站必须仍从 `Create.RAILWAYS.trackNetworks` 查图 | 隔离靠 4 个"入口拦截"mixin；存储靠"运行时合并、持久化分离" |
 | C3 | 轨道方块必须复用 Create 的 `AllBlockEntityTypes.TRACK` + `TrackBlockEntity` | 轨道方块只能继承 `TrackBlock`，不得注册新轨道 BE；只有转向架允许自有 BE |
 
@@ -154,12 +154,18 @@ src/main/java/com/easttown/text/
 │   └── AllTrackTypes.java     # 名不副实：TrackType + 3 个 BogeyStyle（P1-1）
 ├── content/
 │   ├── track/Track43kgBlock.java
-│   └── bogey/Track43kgBogeyBlock.java, Track43kgBogeyBlockEntity.java
+│   ├── bogey/Track43kgBogeyBlock.java, Track43kgBogeyBlockEntity.java
+│   └── train/                 # 装配竖直偏移（§5.6）
+│       ├── CarriageYOffsetAccess.java, StationOffsetAccess.java
+│       └── CarriageOffsets.java
 ├── client/Hxd3cBogeyRenderer.java, Hxd3cBogeyVisual.java
 │          TrainBoxRenderer.java, ClientTrainBoxState.java   # /textbox 线框（仅客户端）
+│          StationOffsetBox.java                              # 车站 GUI 的偏移输入框
+
 ├── command/TextCommands.java  # /textbox 调试指令
-├── net/TextNetwork.java, TrainBoxPayload.java   # 服务端→客户端的开关包
-├── mixin/                     # 13 个，契约见 §5.2
+├── network/TextNetwork.java, TrainBoxPayload.java   # 服务端→客户端的开关包
+│         StationOffsetPayload.java                  # 客户端→服务端的车站偏移设定
+├── mixin/                     # 22 个（主 17 + client 子包 5），契约见 §5.2
 ├── data/TextTrackSavedData.java
 └── util/TrackCurveCollisionHelper.java   # 实际是"mixin 可调用的服务层"（R-JVM）
          TrainBoxGeometry.java              # 车厢碰撞盒几何（双端共用）
@@ -170,7 +176,7 @@ src/main/resources/
 src/main/templates/META-INF/neoforge.mods.toml   # generateModMetadata 展开变量
 ```
 
-### 5.2 mixin 契约表（13 个）
+### 5.2 mixin 契约表（22 个）
 
 | # | 类 | 目标 | 注入点 | 失败表现 |
 |---|---|---|---|---|
@@ -187,9 +193,43 @@ src/main/templates/META-INF/neoforge.mods.toml   # generateModMetadata 展开变
 | 11 | `TrainReadMixin` | `Train` | `read` HEAD | 进存档全车脱轨 |
 | 12 | `CTrainsMixin` | `CTrains` | `<init>` ModifyConstant(128) | 长轨放不下 |
 | 13 | `TrackTargetingBlockItemMixin` | `TrackTargetingBlockItem` | `useOn` 两处常量 16 | 绑定距离写死 |
+| 14 | `CarriageOffsetMixin` | `Carriage` | `write`/`read` RETURN（`@Unique float`，实现 `CarriageYOffsetAccess`） | 偏移不进存档 |
+| 15 | `CarriageSyncOffsetMixin` | `CarriageSyncData` | `write`/`read`/`update`/`apply`/`copy` RETURN | 客户端不知道偏移，车厢"跳回原位" |
+| 16 | `ContraptionAnchorOffsetMixin` | `AbstractContraptionEntity` | `getAnchorVec`/`getPrevAnchorVec` HEAD（cancellable） | 渲染抬了、碰撞与交互留在原位 |
+| 17 | `StationBlockOffsetMixin` | `StationBlockEntity` | `write`/`read` RETURN + `assemble` Redirect(`addTrain`) | 车站设定不保存 / 组装不带偏移 |
+| 18 | `client.ContraptionRenderOffsetMixin` | `OrientedContraptionEntity` | `applyLocalTransforms` HEAD | 车厢渲染不动（碰撞照旧抬，穿模） |
+| 19 | `client.StationScreenOffsetMixin` | `StationScreen` | `init`（`tickTrainDisplay` 调用前） | 车站界面没有偏移输入框 |
+| 20 | `client.AssemblyScreenOffsetMixin` | `AssemblyScreen` | `init` RETURN | **装配界面**没有偏移输入框 |
+| 21 | `client.ScreenWidgetAccessMixin` | `Screen` | `@Invoker("addRenderableWidget")` | 19/20 号无处调用 protected 父类方法 |
+| 22 | `client.AbstractStationScreenAccessMixin` | `AbstractStationScreen` | `@Accessor("blockEntity")` | 19/20 号读不到车站方块实体 |
 
-分组：**轨距隔离 1-4**、**曲线碰撞 5-6**、**曲线几何 7-8**、**持久化 9-11**、**放宽限位 12-13**。
-新增 mixin 前先确认是否属于已有分组——多数需求应当扩展现有 mixin，而不是加第 14 个。
+分组：**轨距隔离 1-4**、**曲线碰撞 5-6**、**曲线几何 7-8**、**持久化 9-11**、**放宽限位 12-13**、
+**装配竖直偏移 14-22**。
+新增 mixin 前先确认是否属于已有分组——多数需求应当扩展现有 mixin，而不是加第 23 个。
+
+**登记分两处**：主 `mixins` 数组是双端加载，`client` 数组只在物理客户端加载。
+判断标准不是"目标类只存在于客户端"，而是**handler 方法体里有没有仅客户端类型**
+（`PoseStack`、`Screen`、`GuiGraphics` 等）。`OrientedContraptionEntity` 双端都有，
+但它的 `applyLocalTransforms` 参数是 `PoseStack`，所以 `ContraptionRenderOffsetMixin`
+一开始放在主数组里，专用服务端启动时直接
+`ClassNotFoundException: com.mojang.blaze3d.vertex.PoseStack` 崩在 `MixinPreProcessorStandard`。
+
+**`@Shadow` 不能跨父类，也不要用 refMap 去救**（两条都实测过）：
+
+- `@Shadow` 只认**目标类自身声明**的成员。`StationScreen` 的 `blockEntity` 声明在
+  `AbstractStationScreen`、`addRenderableWidget` 声明在 `Screen`，shadow 两者都会抛
+  `InvalidMixinException: ... was not located in the target class ... No refMap loaded`，
+  并且一崩就把 Create 整个带下去（Sodium 随后报 "config could not be found"，看崩溃报告会跑偏）。
+- 加 Mixin AP 生成 refMap 也不行：AP 要 searge→notch 的映射表才能写出条目，而
+  NeoForge 1.20.5+ 走"不做混淆"路线、工程里没有任何 mappings，AP 会对每个成员报
+  `Unable to locate obfuscation mapping` 并**编译失败**；就算压成空表，Mixin 对每个
+  `@Inject` target 也查 refMap，空表会让全部 mixin 失效。
+- 正解是 **`@Accessor` / `@Invoker`，且 mixin 到成员的声明类**（不是子类）：
+  `AbstractStationScreenAccessMixin`（读 `blockEntity`）、`ScreenWidgetAccessMixin`
+  （调 `addRenderableWidget`）。访问器接口放在**非 mixin 包**（`client/StationBlockEntityAccess`、
+  `client/ScreenWidgetAccess`）供 handler cast，否则触发 R-JVM。
+- 顺带规则：`guiLeft` / `guiTop` 这类 catnip 字段也别 shadow，直接从
+  `Screen.width/height`（public）减背景尺寸算，与 `AbstractSimiScreen.init` 的算法一致。
 
 ### 5.3 重构进度
 
@@ -202,7 +242,7 @@ src/main/templates/META-INF/neoforge.mods.toml   # generateModMetadata 展开变
 | `util/TrackCurveCollisionHelper` | `feature/curvecollision/CurveCollision` | 2 | 待做 |
 | `AllTrackTypes` | `registry/AllTrackStyles` | 2 | 待做 |
 | `TextClient` 内的 MODEL_SWAPPER 注册 | `client/TrackModelSwaps` | 2 | 待做 |
-| 13 个 mixin | 按 feature 分包 | 3 | 待做（`text.mixins.json` 同步改） |
+| 22 个 mixin | 按 feature 分包 | 3 | 待做（`text.mixins.json` 同步改） |
 | 4 个轨距 mixin 内重复判定 | 抽 `GaugeRules` | 3 | 待做 |
 | `Config.onConfigEvent` 全图扫描 | "标记 dirty + 懒清理" | 3 | 待做 |
 
@@ -252,12 +292,45 @@ src/main/templates/META-INF/neoforge.mods.toml   # generateModMetadata 展开变
 - 小盒变换后用 **8 个角点连 12 条棱**，不要转成世界 AABB——车厢在弯道上是斜的，轴对齐会把盒子撑大、转角失真。
 - 一个车厢可能上百个盒子，绘制有距离剔除（128 格），别去掉。
 
+### 5.6 装配竖直偏移（车厢高度）
+
+列车组装后可以让整节车厢相对转向架上下移动（车站 GUI 的"装配高度偏移"输入框，范围 ±1.5 格）。
+
+**语义**：正值抬高车厢。偏移**只作用于 contraption**——方块渲染、逐方块碰撞、
+实体 AABB、交互点位。**转向架整体不动**（构架、轮对、传动箱全部留在原位），
+世界里单独摆放的转向架方块与轨道同样不受影响。
+
+**数据落在三处**：
+
+| 位置 | 谁写 | 用途 |
+|---|---|---|
+| `Carriage` 的 `@Unique float` | `CarriageOffsetMixin`，键 `TextCarriageYOffset` | 真实数据，随列车存档 |
+| `StationBlockEntity` 的 `@Unique float` | `StationBlockOffsetMixin`，同一个键名 | 装配参数，随方块实体存档；服务端 `sendData()` 把值送到客户端 GUI |
+| `CarriageSyncData` 的 `@Unique float` | `CarriageSyncOffsetMixin` | 客户端拿到偏移——复用 Create 既有的每节车厢同步通道，不新开包 |
+
+**两个注入点撑起全部效果**：
+
+| 要动的东西 | 注入点 | 原理 |
+|---|---|---|
+| 方块 / 方块实体 / actors 的渲染 | `OrientedContraptionEntity#applyLocalTransforms` HEAD | 经典路径（`ContraptionMatrices#setup`）与 Flywheel 路径（`ContraptionVisual#setEmbeddingMatrices`）都收敛到这个方法，抬 PoseStack 即可 |
+| 逐方块碰撞、实体 AABB、`toGlobalVector`（点车厢方块、坐座位） | `AbstractContraptionEntity#getAnchorVec` | 锚点是"局部 → 世界"的唯一原点。抬高它 = 抬高整节车厢的碰撞体，而**实体坐标本身不动**——转向架的世界位置由 `CarriageBogey` 的 `TravellingPoint` 独立计算，所以轮对不跟着浮起来 |
+
+**转向架不参与偏移**：`BogeyStyle` 的渲染器与视觉全部用 Create 原版
+（`StandardBogeyRenderer/Visual`、`Hxd3cBogeyRenderer/Visual`），不读任何偏移量。
+曾经做过"转向架上半跟随车厢、轮对留在钢轨"的分层方案（`BogeyLayerOffset` + 分层副本
++ 两个 push/pop mixin），实测观感是车架与轮对之间断开一条缝，已整体撤除——
+转向架留在原位、只有车厢移动才是想要的效果。
+
+**改偏移后必须手动刷 AABB**：`AbstractContraptionEntity#setPos` 是唯一重算包围盒的地方，
+静止的列车不会自己调它，所以 `CarriageOffsets.refreshBounds` 会在同坐标上补一次 `setPos`。
+少了这一步的表现是"车厢抬起来了，但推不动 / 能穿过去"。
+
 ## 6. 代码约定
 
 - 注册类：`public final class Xxx`，私有构造器，静态字段全大写 `DeferredHolder` / `DeferredRegister`。
 - NeoForge 21.1 的 `@Nonnull` 分析噪声大：现有代码大量使用 `@SuppressWarnings("null")`。**保留它们**，新代码照此办理。
 - mixin handler 方法统一前缀 `text$`；注入点选 `@Inject` / `@ModifyConstant` / `@Redirect`，不用 `@Overwrite`。target 为内部类时用 `targets = "全限定$内部类"` 字符串。
-- mixin 类命名 `<目标类>Mixin`，**必须在 `text.mixins.json` 的 `mixins` 数组里登记**，否则静默不生效。
+- mixin 类命名 `<目标类>Mixin`，**必须在 `text.mixins.json` 登记**，否则静默不生效：双端可加载的写主 `mixins` 数组，handler 里出现 `PoseStack` / `Screen` / `GuiGraphics` 等仅客户端类型的写 `client` 数组（判据见 §5.2 末尾）。
 - **handler 方法体内只引用非 mixin 包**（R-JVM，§4.2）。
 - Javadoc **用中文写"为什么"**：Create 侧的原始行为、注入位置、改动的副作用。这是本仓库最重要的知识载体。
 - 局部变量用 `var`；单语句 `if` 不加花括号；缩进 4 空格（个别文件有历史 tab，新增代码用空格）。
