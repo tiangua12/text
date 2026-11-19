@@ -38,7 +38,7 @@
 | 硬依赖 | Create `6.0.10-281`（`slim`, `transitive=false`） | `dependencies` |
 | 传递依赖（手动声明） | Ponder `1.0.82`、Flywheel `1.0.6`（compileOnly API + runtimeOnly）、Registrate `MC1.21-1.3.0+67` | 同上 |
 | mod id / 包 | `text` / `com.easttown.text` | `gradle.properties` |
-| 产物 | `build/libs/text-1.1.0.jar` | `mod_id` + `mod_version` |
+| 产物 | `build/libs/text-1.2.0.jar` | `mod_id` + `mod_version` |
 
 Create 用的是 `slim` + `transitive = false`：**它的传递依赖不会自动进来**，删掉
 `ponder` / `flywheel` / `registrate` 任意一行都会立刻编译失败。
@@ -59,7 +59,7 @@ Create 用的是 `slim` + `transitive = false`：**它的传递依赖不会自�
 
 验证产物：
 ```powershell
-jar tf build/libs/text-1.1.0.jar | Select-String 'assets/text|data/create/tags|text.mixins.json'
+jar tf build/libs/text-1.2.0.jar | Select-String 'assets/text|data/create/tags|text.mixins.json'
 ```
 
 ### 环境约束（踩过）
@@ -284,7 +284,7 @@ src/main/templates/META-INF/neoforge.mods.toml   # generateModMetadata 展开变
 
 ## 9. 交付前检查
 
-1. `.\gradlew.bat build` 0 error；`build/libs/text-1.1.0.jar` 时间戳刷新。
+1. `.\gradlew.bat build` 0 error；`build/libs/text-1.2.0.jar` 时间戳刷新。
 2. jar 内抽查：`assets/text/blockstates/track_43kg.json`、`assets/text/models/block/track/*.obj`、`text.mixins.json`、`data/create/tags/block/tracks.json`。
 3. 结构类改动额外核验：
    - `text.mixins.json` 的 `mixins` 条数 == 带 `@Mixin` 的类数；`package` 字段与目录一致。
@@ -309,15 +309,15 @@ src/main/templates/META-INF/neoforge.mods.toml   # generateModMetadata 展开变
 
 ```bash
 # 1) 改版本号（唯一版本源）
-#    gradle.properties: mod_version=1.1.0
+#    gradle.properties: mod_version=1.2.0
 # 2) 本地先确认构建干净
 .\gradlew.bat build
 # 3) 提交并打 tag（tag 名必须以 v 开头，与工作流条件 startsWith(github.ref, 'refs/tags/') 匹配）
 git add -A
-git commit -m "release: v1.1.0"
-git tag v1.1.0
+git commit -m "release: v1.2.0"
+git tag v1.2.0
 git push origin main --tags
-# 4) CI 跑完 → Releases 页面出现 v1.1.0，附件是 text-1.1.0.jar
+# 4) CI 跑完 → Releases 页面出现 v1.2.0，附件是 text-1.2.0.jar
 ```
 
 注意：
